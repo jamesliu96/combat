@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Combat</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .game {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        user-select: none;
+        font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
+        gap: 10px;
+      }
+      .rank {
+        display: grid;
+        grid-template-rows: repeat(3, auto);
+        grid-auto-flow: column;
+        gap: 8px;
+        padding: 12px;
+        font-size: 14px;
+        line-height: 1;
+        background-color: lightgray;
+        border-radius: 4px;
+        counter-reset: rank;
+      }
+      .rank > div {
+        padding: 4px;
+        border-radius: 4px;
+      }
+      .rank > div::before {
+        counter-increment: rank;
+        content: counter(rank) ': ';
+        color: lightslategray;
+      }
+      .logic {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .board {
+        display: grid;
+        grid-template-columns: repeat(var(--w), auto);
+        gap: 4px;
+        padding: 6px;
+        background-color: lightgray;
+        border-radius: 6px;
+      }
+      .cell {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        font-size: 12px;
+        line-height: 1;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .uuid {
+        color: lightgray;
+        font-size: xx-small;
+      }
+      #editor {
+        width: 600px;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game">
+      <div class="rank"></div>
+      <div class="logic">
+        <input type="text" id="name" maxlength="8" placeholder="nickname" />
+        <button id="set">set</button>
+        <div id="color" class="cell">0</div>
+      </div>
+      <div class="board"></div>
+      <div class="uuid"></div>
+      <div id="editor"></div>
+      <div class="logic">
+        <button id="save">save</button>
+        <button id="load">load</button>
+        <input
+          type="number"
+          id="int"
+          min="100"
+          max="1000"
+          step="100"
+          value="100"
+        />
+        ms
+        <button id="run">run</button>
+      </div>
+      <textarea id="logger" cols="30" rows="10"></textarea>
+      <div class="logic">
+        <button id="clear">clear</button>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
