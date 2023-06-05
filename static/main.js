@@ -218,7 +218,7 @@ addEventListener('load', () => {
     }
   });
   $color.addEventListener('click', async () => {
-    const { u } = await Combat.updateHue(Math.random() * 360);
+    const { u } = await Combat.updateHue(Math.floor(Math.random() * 360));
     refreshUser(u);
   });
 

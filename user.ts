@@ -6,7 +6,7 @@ export class User {
   constructor(
     readonly game: Game,
     public name = '',
-    public hue = Math.random() * 360
+    public hue = Math.floor(Math.random() * 360)
   ) {
     this.uuid = crypto.randomUUID();
   }

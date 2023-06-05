@@ -52,7 +52,7 @@ await new Application()
             _.u = user;
           }
           if (typeof h === 'number') {
-            const hue = h % 360;
+            const hue = Math.floor(h % 360);
             log('hue', user, user.hue.toFixed(), '->', hue.toFixed());
             user.hue = hue;
             _.u = user;
