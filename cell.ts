@@ -35,7 +35,7 @@ export class Cell {
     this.takenAt = this.attackedAt + this.takeTime;
   }
 
-  protected toJSON() {
+  protected toJSON(): ICell {
     return {
       x: this.x,
       y: this.y,

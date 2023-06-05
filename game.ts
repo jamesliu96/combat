@@ -69,12 +69,14 @@ export class Game {
     return this.cells[x + y * this.width];
   }
 
-  protected toJSON() {
+  protected toJSON(): IGame {
     this.#update();
     return {
       w: this.width,
       h: this.height,
+      // @ts-expect-error internal
       c: this.cells,
+      // @ts-expect-error internal
       u: [...this.users],
       i: this.idle,
       a: this.min,

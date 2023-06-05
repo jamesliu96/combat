@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Combat</title>
     <style>
-      body {
-        margin: 0;
-      }
       .game {
         display: flex;
         flex-direction: column;
@@ -41,6 +38,9 @@
         display: flex;
         align-items: center;
         gap: 4px;
+      }
+      .text {
+        font-size: 12px;
       }
       .board {
         display: grid;
@@ -94,7 +94,7 @@
           step="100"
           value="100"
         />
-        ms
+        <span class="text">ms</span>
         <button id="run">run</button>
       </div>
       <textarea id="logger" cols="30" rows="10"></textarea>

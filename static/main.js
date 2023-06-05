@@ -4,9 +4,7 @@ addEventListener('load', () => {
 
   const getValue = async () =>
     localStorage.getItem(CODE_KEY) ||
-    (await (await fetch('default.js')).text());
-
-  const AsyncFunction = async function () {}.constructor;
+    (await (await fetch('example.js')).text());
 
   if (!('randomUUID' in crypto))
     crypto.randomUUID = function randomUUID() {
@@ -31,8 +29,10 @@ addEventListener('load', () => {
   const $logger = document.querySelector('#logger');
   const $clear = document.querySelector('#clear');
 
-  const reverseHue = (hue) => (hue + 180) % 360;
+  /** @param {number} h */
+  const reverseHue = (h) => (h + 180) % 360;
 
+  /** @param {IUser} u */
   const refreshUser = (u) => {
     $name.value = u.n;
     $color.style.setProperty('background', `hsl(${u.h},100%,50%)`);
@@ -40,6 +40,7 @@ addEventListener('load', () => {
     $uuid.textContent = u.u;
     $uuid.style.setProperty('color', null);
   };
+  /** @param {IGame} g */
   const refreshGame = (g) => {
     const hues = {};
     const getHue = (id) => {
@@ -58,7 +59,7 @@ addEventListener('load', () => {
           $cell.className = 'cell';
           const { x, y } = g.c[idx];
           $cell.addEventListener('click', () => {
-            attack(x, y);
+            Combat.attack(x, y);
           });
           return $cell;
         })
@@ -111,7 +112,6 @@ addEventListener('load', () => {
 
   let editor;
   let loop;
-  let int;
 
   $rank.append(...Array.from(Array(9), () => document.createElement('div')));
 
@@ -125,7 +125,7 @@ addEventListener('load', () => {
       noSemanticValidation: true,
       noSyntaxValidation: false,
     });
-    const LIB_SOURCE = await (await fetch('game.d.ts')).text();
+    const LIB_SOURCE = await (await fetch('combat.d.ts')).text();
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
       LIB_SOURCE,
       LIB_URI
@@ -158,25 +158,35 @@ addEventListener('load', () => {
     });
   };
 
-  const attack = (x, y) => send({ x, y });
-  const fetchUser = () => send({ u: 1 });
-  const fetchGame = () => send({ g: 1 });
-  const fetchUserGame = () => send({ u: 1, g: 1 });
-  const updateName = (n) => send({ n });
-  const updateHue = (h) => send({ h });
-  const getCell = (game, x, y) => {
-    if (x < 0 || x > game.w - 1 || y < 0 || y > game.h - 1) return;
-    return game.c[x + y * game.w];
+  /** @type {Combat} */
+  const Combat = {
+    attack: (x, y) => send({ x, y }),
+    fetchUser: () => send({ u: 1 }),
+    fetchGame: () => send({ g: 1 }),
+    fetchUserGame: () => send({ u: 1, g: 1 }),
+    updateName: (n) => send({ n }),
+    updateHue: (h) => send({ h }),
+    log: (...args) => {
+      console.log(...args);
+      $logger.textContent += `${args
+        .map((x) => {
+          try {
+            return JSON.stringify(x);
+          } catch {
+            return x;
+          }
+        })
+        .join(' ')}\n`;
+    },
   };
-  const calcDistance = (a, b) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
   socket.onopen = async () => {
-    const { u, g } = await fetchUserGame();
+    const { u, g } = await Combat.fetchUserGame();
     refreshUser(u);
     refreshGame(g);
     loop = setInterval(async () => {
-      const { g } = await fetchGame();
-      refreshGame(g);
+      // const { g } = await Combat.fetchGame();
+      // refreshGame(g);
     }, 100);
   };
   socket.onmessage = ({ data }) => {
@@ -203,12 +213,12 @@ addEventListener('load', () => {
 
   $set.addEventListener('click', async () => {
     if ($name.value) {
-      const { u } = await updateName($name.value);
+      const { u } = await Combat.updateName($name.value);
       refreshUser(u);
     }
   });
   $color.addEventListener('click', async () => {
-    const { u } = await updateHue(Math.random() * 360);
+    const { u } = await Combat.updateHue(Math.random() * 360);
     refreshUser(u);
   });
 
@@ -219,37 +229,19 @@ addEventListener('load', () => {
     editor?.setValue(await getValue());
   });
 
-  $run.addEventListener('click', () => {
-    clearInterval(int);
-    const fn = new AsyncFunction('Game', 'log', editor?.getValue());
-    const Game = {
-      attack,
-      fetchUser,
-      fetchGame,
-      fetchUserGame,
-      updateName,
-      updateHue,
-      getCell,
-      calcDistance,
-    };
-    const log = (...args) => {
-      console.log(...args);
-      $logger.textContent += `${args
-        .map((x) => {
-          try {
-            return JSON.stringify(x);
-          } catch {
-            return x;
-          }
-        })
-        .join(' ')}\n`;
-    };
-    fn(Game, log);
-    int = setInterval(() => {
-      fn(Game, log);
-    }, parseInt($int.value));
-  });
+  const worker = new Worker('worker.js');
+  worker.onmessage = async ({ data: { $, n, a } }) => {
+    worker.postMessage({ $, d: await Combat[n]?.(...a) });
+  };
 
+  $run.addEventListener('click', () => {
+    worker.postMessage({
+      c: editor?.getValue(),
+      i: parseInt($int.value),
+      s: 'Combat',
+      f: Object.keys(Combat),
+    });
+  });
   $clear.addEventListener('click', () => {
     $logger.textContent = '';
   });

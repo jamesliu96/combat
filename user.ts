@@ -25,7 +25,7 @@ export class User {
     return x?.uuid === this.uuid;
   }
 
-  protected toJSON() {
+  protected toJSON(): IUser {
     return {
       u: this.uuid,
       n: this.name,

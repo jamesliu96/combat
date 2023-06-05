@@ -1,4 +1,4 @@
-interface Cell {
+interface ICell {
   /** x-coordinate */
   x: number;
   /** y-coordinate */
@@ -17,7 +17,7 @@ interface Cell {
   t: number;
 }
 
-interface User {
+interface IUser {
   /** UUID */
   u: string;
   /** Nickname */
@@ -30,15 +30,15 @@ interface User {
   a: number;
 }
 
-interface Game {
+interface IGame {
   /** Width */
   w: number;
   /** Height */
   h: number;
   /** Cells */
-  c: Cell[];
+  c: ICell[];
   /** Users */
-  u: User[];
+  u: IUser[];
   /** Idle(unclaimed) take time */
   i: number;
   /** Minimum take time */
@@ -49,23 +49,21 @@ interface Game {
   t: number;
 }
 
-declare const Game: {
+type Combat = {
   /** Attack a cell at \`(x,y)\` coordinate */
   attack: (x: number, y: number) => Promise<{ a: number }>;
   /** Fetch current user */
-  fetchUser: () => Promise<{ u: User }>;
+  fetchUser: () => Promise<{ u: IUser }>;
   /** Fetch game */
-  fetchGame: () => Promise<{ g: Game }>;
+  fetchGame: () => Promise<{ g: IGame }>;
   /** Fetch current user & game */
-  fetchUserGame: () => Promise<{ u: User; g: Game }>;
+  fetchUserGame: () => Promise<{ u: IUser; g: IGame }>;
   /** Update user nickname */
-  updateName: (n: string) => Promise<{ u: User }>;
+  updateName: (n: string) => Promise<{ u: IUser }>;
   /** Update user hue */
-  updateHue: (h: number) => Promise<{ u: User }>;
-  /** Get a cell at \`(x,y)\` coordinate */
-  getCell: (game: Game, x: number, y: number) => Cell | undefined;
-  /** Calculate distance between two cells */
-  calcDistance: (a: Cell, b: Cell) => number;
+  updateHue: (h: number) => Promise<{ u: IUser }>;
+  /** Output log */
+  log: (...args: unknown[]) => Promise<void>;
 };
 
-declare const log: typeof console.log;
+declare const Combat: Combat;
