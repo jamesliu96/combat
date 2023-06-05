@@ -185,8 +185,8 @@ addEventListener('load', () => {
     refreshUser(u);
     refreshGame(g);
     loop = setInterval(async () => {
-      // const { g } = await Combat.fetchGame();
-      // refreshGame(g);
+      const { g } = await Combat.fetchGame();
+      refreshGame(g);
     }, 100);
   };
   socket.onmessage = ({ data }) => {
