@@ -22,14 +22,14 @@ export class Cell {
     readonly gold: boolean
   ) {}
 
-  #getAdjacent(user: User) {
+  #adj(user: User) {
     const { x, y } = this;
     return [
       this.game.getCell(x, y + 1),
       this.game.getCell(x + 1, y),
       this.game.getCell(x, y - 1),
       this.game.getCell(x - 1, y),
-    ].filter((c) => user.is(c?.owner)).length;
+    ].filter((c) => c && user.is(c.#owner)).length;
   }
 
   get baseTakeTime() {
@@ -42,9 +42,7 @@ export class Cell {
 
   getTakeTime(user?: User) {
     if (!user) return this.baseTakeTime;
-    return (
-      this.baseTakeTime * (1 - 0.25 * Math.max(0, this.#getAdjacent(user) - 1))
-    );
+    return this.baseTakeTime * (1 - 0.25 * Math.max(0, this.#adj(user) - 1));
   }
 
   update() {
@@ -60,20 +58,13 @@ export class Cell {
   attack(user: User) {
     if (user.attacking.length || this.attacker) return false;
     if (!user.occupied.length) return this.#attack(user);
-    if (user.is(this.owner) || this.#getAdjacent(user))
-      return this.#attack(user);
+    if (user.is(this.owner) || this.#adj(user)) return this.#attack(user);
     return false;
   }
   #attack(user: User) {
-    const t = this.getTakeTime(user);
-    if (t) {
-      this.#attacker = user;
-      this.#attackedAt = this.game.now;
-      this.#takenAt = this.#attackedAt + t;
-    } else {
-      this.#owner = user;
-      this.#ownedAt = this.game.now;
-    }
+    this.#attacker = user;
+    this.#attackedAt = this.game.now;
+    this.#takenAt = this.#attackedAt + this.getTakeTime(user);
     return true;
   }
 
