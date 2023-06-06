@@ -39,10 +39,7 @@ export class Game {
     }
     this.worth = Math.max(1, this.worth);
     this.goldWorth = Math.max(1, this.goldWorth);
-    this.energyRatio = Math.max(
-      Number.MIN_VALUE,
-      Math.min(1, this.energyRatio)
-    );
+    this.energyRatio = Math.max(0, Math.min(1, this.energyRatio));
     this.idle = Math.max(0, this.idle);
     this.min = Math.max(0, this.min);
     this.max = Math.max(this.min, this.max);
