@@ -19,7 +19,8 @@ export class Cell {
     readonly game: Game,
     readonly x: number,
     readonly y: number,
-    readonly gold: boolean
+    readonly gold: boolean,
+    readonly energy: boolean
   ) {}
 
   #adj(user: User) {
@@ -42,7 +43,11 @@ export class Cell {
 
   getTakeTime(user?: User) {
     if (!user) return this.baseTakeTime;
-    return this.baseTakeTime * (1 - 0.25 * Math.max(0, this.#adj(user) - 1));
+    return (
+      this.baseTakeTime *
+      (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
+      this.game.energyRatio ** user.energy
+    );
   }
 
   update() {
@@ -73,6 +78,7 @@ export class Cell {
       x: this.x,
       y: this.y,
       g: Number(this.gold) as 0 | 1,
+      e: Number(this.energy) as 0 | 1,
       o: this.#owner?.uuid ?? '',
       a: this.#attacker?.uuid ?? '',
       c: this.#ownedAt,

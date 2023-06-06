@@ -11,6 +11,8 @@ interface IUser {
   a: number;
   /** Score */
   s: number;
+  /** Energy */
+  e: number;
 }
 
 interface ICell {
@@ -20,6 +22,8 @@ interface ICell {
   y: number;
   /** Gold binary */
   g: 0 | 1;
+  /** Energy binary */
+  e: 0 | 1;
   /** Owner's UUID, empty if unclaimed */
   o: string;
   /** Attacker's UUID, empty if at peace */
@@ -43,10 +47,14 @@ interface IGame {
   h: number;
   /** Gold count */
   g: number;
+  /** Energy count */
+  e: number;
   /** Worth */
   v: number;
   /** Gold worth */
   s: number;
+  /** Energy ratio */
+  r: number;
   /** Idle take time (ms) */
   i: number;
   /** Minimum take time (ms) */

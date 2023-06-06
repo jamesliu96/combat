@@ -87,7 +87,11 @@ addEventListener('load', () => {
         );
         $cell.style.setProperty(
           'box-shadow',
-          c.g ? 'gold 0px 0px 5px 0px inset, gold 0px 0px 5px 1px' : null
+          c.g
+            ? 'gold 0px 0px 5px 0px inset, gold 0px 0px 5px 1px'
+            : c.e
+            ? 'skyblue 0px 0px 5px 0px inset, skyblue 0px 0px 5px 1px'
+            : null
         );
       }
     });
@@ -105,7 +109,9 @@ addEventListener('load', () => {
           hue ? `hsl(${reverseHue(hue)}, 100%, 50%)` : null
         );
         $r.style.setProperty('text-decoration', r.a ? 'underline' : null);
-        $r.textContent = `${r.n || r.u.slice(0, 8)} (${r.s})`;
+        $r.textContent = `${r.n || r.u.slice(0, 8)} ($${r.s}) [#${r.o}] [*${
+          r.e
+        }]`;
       } else {
         $r.style.setProperty('background', null);
         $r.style.setProperty('color', null);

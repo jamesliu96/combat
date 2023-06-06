@@ -23,6 +23,9 @@ export class User {
       0
     );
   }
+  get energy() {
+    return this.occupied.reduce((acc, c) => acc + Number(c.energy), 0);
+  }
 
   is(x?: User) {
     return x?.uuid === this.uuid;
@@ -36,6 +39,7 @@ export class User {
       o: this.occupied.length,
       a: this.attacking.length,
       s: this.score,
+      e: this.energy,
     };
   }
 }

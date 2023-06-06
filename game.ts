@@ -12,8 +12,10 @@ export class Game {
     readonly width: number,
     readonly height: number,
     readonly goldCount = 0,
+    readonly energyCount = 0,
     readonly worth = 1,
     readonly goldWorth = 10,
+    readonly energyRatio = 0.99,
     readonly idle = 2000,
     readonly min = 3000,
     readonly max = 30000,
@@ -26,14 +28,27 @@ export class Game {
     const golds = new Set<number>();
     while (golds.size < this.goldCount)
       golds.add(Math.floor(Math.random() * N));
+    this.energyCount = Math.max(
+      0,
+      Math.min(N - this.goldCount, this.energyCount)
+    );
+    const energies = new Set<number>();
+    while (energies.size < this.energyCount) {
+      const idx = Math.floor(Math.random() * N);
+      if (!golds.has(idx)) energies.add(idx);
+    }
     this.worth = Math.max(1, this.worth);
     this.goldWorth = Math.max(1, this.goldWorth);
+    this.energyRatio = Math.max(
+      Number.MIN_VALUE,
+      Math.min(1, this.energyRatio)
+    );
     this.idle = Math.max(0, this.idle);
     this.min = Math.max(0, this.min);
     this.max = Math.max(this.min, this.max);
     this.cells = Array.from(Array(N), (_, idx) => {
       const { x, y } = this.#getCoords(idx);
-      return new Cell(this, x, y, golds.has(idx));
+      return new Cell(this, x, y, golds.has(idx), energies.has(idx));
     });
   }
   #getCoords(idx: number) {
@@ -64,8 +79,10 @@ export class Game {
       w: this.width,
       h: this.height,
       g: this.goldCount,
+      e: this.energyCount,
       v: this.worth,
       s: this.goldWorth,
+      r: this.energyRatio,
       i: this.idle,
       a: this.min,
       z: this.max,
