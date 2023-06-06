@@ -9,7 +9,12 @@ export class Cell {
   attackedAt = 0;
   takenAt = 0;
 
-  constructor(readonly game: Game, readonly x: number, readonly y: number) {}
+  constructor(
+    readonly game: Game,
+    readonly x: number,
+    readonly y: number,
+    readonly gold: boolean
+  ) {}
 
   get takeTime() {
     return this.owner
@@ -35,15 +40,16 @@ export class Cell {
     this.takenAt = this.attackedAt + this.takeTime;
   }
 
-  protected toJSON(): ICell {
+  toJSON(): ICell {
     return {
       x: this.x,
       y: this.y,
+      g: Number(this.gold) as 0 | 1,
       o: this.owner?.uuid ?? '',
       a: this.attacker?.uuid ?? '',
-      ot: this.ownedAt,
-      at: this.attackedAt,
-      tt: this.takenAt,
+      c: this.ownedAt,
+      b: this.attackedAt,
+      u: this.takenAt,
       t: this.takeTime,
     };
   }

@@ -37,15 +37,15 @@ if (u.o) {
       if (j && !j.a) s.add(j);
   }
   if (s.size) {
-    const { x, y } = [...s].sort(COMP)[0];
+    const { x, y } = Array.from([...s]).sort(COMP)[0];
     Combat.attack(x, y);
-    Combat.log(x, y);
+    Combat.log({ x, y });
   }
 } else {
   const t = g.c.filter((c) => !c.a).sort(COMP)[0];
   if (t) {
     const { x, y } = t;
     Combat.attack(x, y);
-    Combat.log(x, y);
+    Combat.log({ x, y });
   }
 }

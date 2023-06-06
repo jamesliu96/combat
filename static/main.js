@@ -35,8 +35,8 @@ addEventListener('load', () => {
   /** @param {IUser} u */
   const refreshUser = (u) => {
     $name.value = u.n;
-    $color.style.setProperty('background', `hsl(${u.h},100%,50%)`);
-    $color.style.setProperty('color', `hsl(${reverseHue(u.h)},100%,50%)`);
+    $color.style.setProperty('background', `hsl(${u.h}, 100%, 50%)`);
+    $color.style.setProperty('color', `hsl(${reverseHue(u.h)}, 100%, 50%)`);
     $uuid.textContent = u.u;
     $uuid.style.setProperty('color', null);
   };
@@ -66,41 +66,46 @@ addEventListener('load', () => {
       );
       $board.style.setProperty('--w', `${g.w}`);
     }
-    g.c.forEach((cell, idx) => {
+    g.c.forEach((c, idx) => {
       const $cell = $board.children.item(idx);
       if ($cell) {
-        $cell.textContent = `${(cell.t / 1000).toFixed()}`;
-        const hueO = getHue(cell.o);
-        const hueA = getHue(cell.a);
-        const perc = (cell.a ? (cell.tt - g.t) / (cell.tt - cell.at) : 1) * 100;
+        $cell.textContent = `${(c.t / 1000).toFixed()}`;
+        const hueO = getHue(c.o);
+        const hueA = getHue(c.a);
+        const perc = (c.a ? (c.u - g.t) / (c.u - c.b) : 1) * 100;
         $cell.style.setProperty(
           'background',
-          `linear-gradient(0,${
+          `linear-gradient(0deg, ${
             hueO
-              ? `hsl(${hueO},100%,${
-                  100 - ((cell.t - g.a) / (g.z - g.a)) * 50
-                }%)`
+              ? `hsl(${hueO}, 100%, ${100 - ((c.t - g.a) / (g.z - g.a)) * 50}%)`
               : 'white'
-          } ${perc}%,${hueA ? `hsl(${hueA},100%,50%)` : 'white'} ${perc}%)`
+          } ${perc}%,${hueA ? `hsl(${hueA}, 100%, 50%)` : 'white'} ${perc}%)`
         );
         $cell.style.setProperty(
           'color',
-          hueO ? `hsl(${reverseHue(hueO)},100%,50%)` : null
+          hueO ? `hsl(${reverseHue(hueO)}, 100%, 50%)` : null
+        );
+        $cell.style.setProperty(
+          'box-shadow',
+          c.g ? 'gold 0px 0px 5px 0px inset, gold 0px 0px 5px 1px' : null
         );
       }
     });
-    const ranking = g.u.filter(({ o }) => o).sort((a, b) => b.o - a.o);
-    [...$rank.children].forEach(($r, idx) => {
+    const ranking = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
+    Array.from($rank.children).forEach(($r, idx) => {
       const r = ranking[idx];
       if (r) {
         const hue = getHue(r.u);
-        $r.style.setProperty('background', hue ? `hsl(${hue},100%,50%)` : null);
+        $r.style.setProperty(
+          'background',
+          hue ? `hsl(${hue}, 100%, 50%)` : null
+        );
         $r.style.setProperty(
           'color',
-          hue ? `hsl(${reverseHue(hue)},100%,50%)` : null
+          hue ? `hsl(${reverseHue(hue)}, 100%, 50%)` : null
         );
         $r.style.setProperty('text-decoration', r.a ? 'underline' : null);
-        $r.textContent = `${r.n || r.u.slice(0, 8)} (${r.o})`;
+        $r.textContent = `${r.n || r.u.slice(0, 8)} (${r.s})`;
       } else {
         $r.style.setProperty('background', null);
         $r.style.setProperty('color', null);

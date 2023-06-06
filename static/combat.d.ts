@@ -1,22 +1,3 @@
-interface ICell {
-  /** x-coordinate */
-  x: number;
-  /** y-coordinate */
-  y: number;
-  /** Owner's UUID, empty if unclaimed */
-  o: string;
-  /** Attacker's UUID, empty if at peace */
-  a: string;
-  /** Claimed at */
-  ot: number;
-  /** Attack begins at */
-  at: number;
-  /** Under attack until, to be claimed at */
-  tt: number;
-  /** Time cost to occupy */
-  t: number;
-}
-
 interface IUser {
   /** UUID */
   u: string;
@@ -26,8 +7,31 @@ interface IUser {
   h: number;
   /** Owned count */
   o: number;
-  /** Attacking count */
-  a: number;
+  /** Attack binary */
+  a: 0 | 1;
+  /** Score */
+  s: number;
+}
+
+interface ICell {
+  /** x-coordinate */
+  x: number;
+  /** y-coordinate */
+  y: number;
+  /** Gold binary */
+  g: 0 | 1;
+  /** Owner's UUID, empty if unclaimed */
+  o: string;
+  /** Attacker's UUID, empty if at peace */
+  a: string;
+  /** Claimed at timestamp (ms) */
+  c: number;
+  /** Attack begins at timestamp (ms) */
+  b: number;
+  /** Under attack until, to be claimed at timestamp (ms) */
+  u: number;
+  /** Time cost to occupy (ms) */
+  t: number;
 }
 
 interface IGame {
@@ -35,17 +39,21 @@ interface IGame {
   w: number;
   /** Height */
   h: number;
+  /** Gold count */
+  g: number;
+  /** Gold worth */
+  s: number;
+  /** Idle(unclaimed) take time (ms) */
+  i: number;
+  /** Minimum take time (ms) */
+  a: number;
+  /** Maximum take time (ms) */
+  z: number;
   /** Cells */
   c: ICell[];
   /** Users */
   u: IUser[];
-  /** Idle(unclaimed) take time */
-  i: number;
-  /** Minimum take time */
-  a: number;
-  /** Maximum take time */
-  z: number;
-  /** Current time */
+  /** Current time (ms) */
   t: number;
 }
 

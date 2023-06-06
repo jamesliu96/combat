@@ -20,18 +20,25 @@ export class User {
   get attacking() {
     return this.game.cells.some((c) => this.is(c.attacker));
   }
+  get score() {
+    return this.occupied.reduce(
+      (acc, c) => acc + (c.gold ? this.game.goldWorth : 1),
+      0
+    );
+  }
 
   is(x?: User) {
     return x?.uuid === this.uuid;
   }
 
-  protected toJSON(): IUser {
+  toJSON(): IUser {
     return {
       u: this.uuid,
       n: this.name,
       h: this.hue,
       o: this.occupied.length,
-      a: Number(this.attacking),
+      a: Number(this.attacking) as 0 | 1,
+      s: this.score,
     };
   }
 }

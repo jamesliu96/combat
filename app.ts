@@ -4,7 +4,7 @@ import { serveDir } from 'https://deno.land/std@0.190.0/http/file_server.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
-const game = new Game(30, 30);
+const game = new Game(30, 30, 10);
 
 const log = (
   type: string,
@@ -53,7 +53,7 @@ await new Application()
           }
           if (typeof h === 'number') {
             const hue = Math.floor(h % 360);
-            log('hue', user, user.hue.toFixed(), '->', hue.toFixed());
+            log('hue', user, user.hue, '->', hue);
             user.hue = hue;
             _.u = user;
           }
