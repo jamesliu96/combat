@@ -7,8 +7,8 @@ interface IUser {
   h: number;
   /** Owned count */
   o: number;
-  /** Attack binary */
-  a: 0 | 1;
+  /** Attack count */
+  a: number;
   /** Score */
   s: number;
 }
@@ -30,7 +30,9 @@ interface ICell {
   b: number;
   /** Under attack until, to be claimed at timestamp (ms) */
   u: number;
-  /** Time cost to occupy (ms) */
+  /** Base time cost to occupy (ms) */
+  p: number;
+  /** User time cost to occupy (ms) */
   t: number;
 }
 
@@ -41,9 +43,11 @@ interface IGame {
   h: number;
   /** Gold count */
   g: number;
+  /** Worth */
+  v: number;
   /** Gold worth */
   s: number;
-  /** Idle(unclaimed) take time (ms) */
+  /** Idle take time (ms) */
   i: number;
   /** Minimum take time (ms) */
   a: number;

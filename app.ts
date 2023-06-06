@@ -33,8 +33,8 @@ await new Application()
         const { response, socket } = Deno.upgradeWebSocket(ctx.request);
         ctx.response = response;
         const user = new User(game);
-        log('welcome', user);
         game.users.add(user);
+        log('welcome', user);
         socket.onmessage = ({ data }) => {
           try {
             data = JSON.parse(data) ?? {};
@@ -44,22 +44,23 @@ await new Application()
           const { $, u, g, n, h, x, y } = data;
           const _: Record<string, unknown> = { $ };
           if (u) _.u = user;
-          if (g) _.g = game;
+          if (g) _.g = game.toJSON(user);
           if (typeof n === 'string') {
             const name = n.slice(0, 8);
-            log('name', user, `'${user.name}'`, '->', `'${name}'`);
             user.name = name;
+            log('name', user, `'${user.name}'`, '->', `'${name}'`);
             _.u = user;
           }
           if (typeof h === 'number') {
             const hue = Math.floor(h % 360);
-            log('hue', user, user.hue, '->', hue);
             user.hue = hue;
+            log('hue', user, user.hue, '->', hue);
             _.u = user;
           }
           if (typeof x === 'number' && typeof y === 'number') {
-            log('attack', user, { x, y });
-            _.a = Number(game.attack(x, y, user));
+            const a = game.attack(x, y, user);
+            _.a = Number(a);
+            log('attack', user, { x, y }, a);
           }
           try {
             socket.send(JSON.stringify(_));

@@ -12,6 +12,7 @@ export class Game {
     readonly width: number,
     readonly height: number,
     readonly goldCount = 0,
+    readonly worth = 1,
     readonly goldWorth = 10,
     readonly idle = 2000,
     readonly min = 3000,
@@ -25,6 +26,7 @@ export class Game {
     const golds = new Set<number>();
     while (golds.size < this.goldCount)
       golds.add(Math.floor(Math.random() * N));
+    this.worth = Math.max(1, this.worth);
     this.goldWorth = Math.max(1, this.goldWorth);
     this.idle = Math.max(0, this.idle);
     this.min = Math.max(0, this.min);
@@ -41,6 +43,11 @@ export class Game {
     };
   }
 
+  getCell(x: number, y: number) {
+    if (x < 0 || x > this.width - 1 || y < 0 || y > this.height - 1) return;
+    return this.cells[x + y * this.width];
+  }
+
   #update() {
     this.now = Date.now();
     for (const cell of this.cells) cell.update();
@@ -48,46 +55,21 @@ export class Game {
 
   attack(x: number, y: number, user: User) {
     this.#update();
-    return this.#attack(x, y, user);
-  }
-  #attack(x: number, y: number, user: User) {
-    const cell = this.#getCell(x, y);
-    if (cell && !cell.attacker && !user.attacking) {
-      if (user.base) {
-        for (const c of [
-          cell,
-          this.#getCell(x, y + 1),
-          this.#getCell(x + 1, y),
-          this.#getCell(x, y - 1),
-          this.#getCell(x - 1, y),
-        ])
-          if (user.is(c?.owner)) {
-            cell.attack(user);
-            return true;
-          }
-      } else {
-        cell.attack(user);
-        return true;
-      }
-    }
-    return false;
-  }
-  #getCell(x: number, y: number) {
-    if (x < 0 || x > this.width - 1 || y < 0 || y > this.height - 1) return;
-    return this.cells[x + y * this.width];
+    return this.getCell(x, y)?.attack(user) ?? false;
   }
 
-  toJSON(): IGame {
+  toJSON(user?: User): IGame {
     this.#update();
     return {
       w: this.width,
       h: this.height,
       g: this.goldCount,
+      v: this.worth,
       s: this.goldWorth,
       i: this.idle,
       a: this.min,
       z: this.max,
-      c: this.cells.map((x) => x.toJSON()),
+      c: this.cells.map((x) => x.toJSON(user)),
       u: Array.from(this.users).map((x) => x.toJSON()),
       t: this.now,
     };
