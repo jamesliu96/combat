@@ -1,4 +1,4 @@
-import { Application, Router } from 'https://deno.land/x/railgun@v0.3.5/mod.ts';
+import { Application, Router } from 'https://deno.land/x/railgun@v0.4.0/mod.ts';
 import { parse } from 'https://deno.land/std@0.190.0/flags/mod.ts';
 import { serveDir } from 'https://deno.land/std@0.190.0/http/file_server.ts';
 import { Game } from './game.ts';
@@ -26,12 +26,11 @@ const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
 await new Application()
   .use(
     new Router()
-      .all('/game', (ctx) => {
+      .get('/game', (ctx) => {
         ctx.body = game;
       })
-      .all('/ws', (ctx) => {
-        const { response, socket } = Deno.upgradeWebSocket(ctx.request);
-        ctx.response = response;
+      .get('/ws', (ctx) => {
+        const socket = ctx.upgrade();
         const user = new User(game);
         game.users.add(user);
         log('welcome', user);
@@ -75,7 +74,7 @@ await new Application()
         socket.onclose = handleError;
         socket.onerror = handleError;
       })
-      .all('/.*', async (ctx) => {
+      .get('/.*', async (ctx) => {
         ctx.response = await serveDir(ctx.request, {
           fsRoot: 'static',
           quiet: true,

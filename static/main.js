@@ -1,31 +1,11 @@
 addEventListener('load', () => {
-  const CODE_KEY = 'combat.code';
-
-  let REMOTE_VALUE;
-  const getRemoteValue = async () => {
-    if (REMOTE_VALUE) return REMOTE_VALUE;
-    REMOTE_VALUE = await (await fetch('example.js')).text();
-    return REMOTE_VALUE;
-  };
-  const getValue = async () =>
-    localStorage.getItem(CODE_KEY) || (await getRemoteValue());
-
-  if (!('randomUUID' in crypto))
-    crypto.randomUUID = function randomUUID() {
-      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-        (
-          c ^
-          (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-        ).toString(16)
-      );
-    };
-
   const $rank = document.querySelector('.rank');
   const $name = document.querySelector('#name');
   const $set = document.querySelector('#set');
   const $color = document.querySelector('#color');
   const $board = document.querySelector('.board');
-  const $uuid = document.querySelector('.uuid');
+  const $uuid = document.querySelector('#uuid');
+  const $editor = document.querySelector('#editor');
   const $save = document.querySelector('#save');
   const $load = document.querySelector('#load');
   const $int = document.querySelector('#int');
@@ -35,7 +15,6 @@ addEventListener('load', () => {
 
   /** @param {number} h */
   const reverseHue = (h) => (h + 180) % 360;
-
   /** @param {IUser} u */
   const refreshUser = (u) => {
     $name.value = u.n;
@@ -45,7 +24,7 @@ addEventListener('load', () => {
     $uuid.style.setProperty('color', null);
   };
   /** @param {IGame} g */
-  const refreshGame = (g) => {
+  const refreshGame = (g, v = false) => {
     const hues = {};
     const getHue = (id) => {
       if (!id) return;
@@ -61,10 +40,12 @@ addEventListener('load', () => {
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
           $cell.className = 'cell';
-          const { x, y } = g.c[idx];
-          $cell.addEventListener('click', () => {
-            Combat.attack(x, y);
-          });
+          if (!v) {
+            const { x, y } = g.c[idx];
+            $cell.addEventListener('click', () => {
+              Combat.attack(x, y);
+            });
+          }
           return $cell;
         })
       );
@@ -73,7 +54,6 @@ addEventListener('load', () => {
     g.c.forEach((c, idx) => {
       const $cell = $board.children.item(idx);
       if ($cell) {
-        $cell.textContent = `${(c.t / 1000).toFixed()}`;
         const hueO = getHue(c.o);
         const hueA = getHue(c.a);
         const perc = (c.a ? (c.u - g.t) / (c.u - c.b) : 1) * 100;
@@ -97,6 +77,7 @@ addEventListener('load', () => {
             ? 'skyblue 0px 0px 5px 0px inset, skyblue 0px 0px 5px 1px'
             : null
         );
+        $cell.textContent = `${(c.t / 1000).toFixed()}`;
       }
     });
     const ranking = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
@@ -125,141 +106,162 @@ addEventListener('load', () => {
     });
   };
 
-  let editor;
-  let loop;
+  $rank.append(
+    ...Array.from(Array(9), () => {
+      const $e = document.createElement('div');
+      $e.title = '$: score; #: occupied; *: energy';
+      return $e;
+    })
+  );
 
-  $rank.append(...Array.from(Array(9), () => document.createElement('div')));
-
-  require.config({
-    paths: {
-      vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs',
-    },
-  });
-  require(['vs/editor/editor.main'], async () => {
-    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-      noSemanticValidation: true,
-      noSyntaxValidation: false,
+  if (new URLSearchParams(location.search).get('view') !== null) {
+    document
+      .querySelectorAll('.logic')
+      .forEach(($e) => $e.style.setProperty('display', 'none'));
+    $uuid.style.setProperty('display', 'none');
+    $editor.style.setProperty('display', 'none');
+    $logger.style.setProperty('display', 'none');
+    const refresh = () =>
+      fetch('/game')
+        .then((r) => r.json())
+        .then((j) => refreshGame(j, true));
+    refresh();
+    setInterval(refresh, 100);
+  } else {
+    const CODE_KEY = 'combat.code';
+    let LOOP;
+    let EDITOR;
+    let REMOTE_VALUE;
+    const getRemoteValue = async () => {
+      if (REMOTE_VALUE) return REMOTE_VALUE;
+      REMOTE_VALUE = await (await fetch('example.js')).text();
+      return REMOTE_VALUE;
+    };
+    const getValue = async () =>
+      localStorage.getItem(CODE_KEY) || (await getRemoteValue());
+    require.config({
+      paths: {
+        vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs',
+      },
     });
-    const LIB_SOURCE = await (await fetch('combat.d.ts')).text();
-    const LIB_URI = 'ts:combat.d.ts';
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(
-      LIB_SOURCE,
-      LIB_URI
-    );
-    monaco.editor.createModel(
-      LIB_SOURCE,
-      'typescript',
-      monaco.Uri.parse(LIB_URI)
-    );
-    editor = monaco.editor.create(document.querySelector('#editor'), {
-      theme: 'vs-dark',
-      language: 'javascript',
-      automaticLayout: true,
-      tabSize: 2,
-      value: await getValue(),
+    require(['vs/editor/editor.main'], async () => {
+      monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+        noSemanticValidation: true,
+        noSyntaxValidation: false,
+      });
+      const LIB_SOURCE = await (await fetch('combat.d.ts')).text();
+      const LIB_URI = 'ts:combat.d.ts';
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(
+        LIB_SOURCE,
+        LIB_URI
+      );
+      monaco.editor.createModel(
+        LIB_SOURCE,
+        'typescript',
+        monaco.Uri.parse(LIB_URI)
+      );
+      EDITOR = monaco.editor.create($editor, {
+        theme: 'vs-dark',
+        language: 'javascript',
+        automaticLayout: true,
+        tabSize: 2,
+        value: await getValue(),
+      });
     });
-  });
-
-  const socket = new WebSocket(`ws://${location.host}/ws`);
-
-  const pool = new Map();
-  const send = (d) => {
-    const $ = crypto.randomUUID();
-    return new Promise((resolve) => {
-      pool.set($, resolve);
+    const socket = new WebSocket(`ws://${location.host}/ws`);
+    const pool = new Map();
+    const send = (d) => {
+      const $ = crypto.randomUUID();
+      return new Promise((resolve) => {
+        pool.set($, resolve);
+        try {
+          socket.send(JSON.stringify({ $, ...d }));
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    };
+    /** @type {Combat} */
+    const Combat = {
+      attack: (x, y) => send({ x, y }),
+      fetchUser: () => send({ u: 1 }),
+      fetchGame: () => send({ g: 1 }),
+      fetchUserGame: () => send({ u: 1, g: 1 }),
+      updateName: (n) => send({ n }),
+      updateHue: (h) => send({ h }),
+      log: (...args) => {
+        console.log(...args);
+        $logger.value += `${args
+          .map((x) => {
+            try {
+              return JSON.stringify(x);
+            } catch {
+              return x;
+            }
+          })
+          .join(' ')}\n`;
+      },
+    };
+    socket.onopen = async () => {
+      const { u, g } = await Combat.fetchUserGame();
+      refreshUser(u);
+      refreshGame(g);
+      LOOP = setInterval(async () => {
+        const { g } = await Combat.fetchGame();
+        refreshGame(g);
+      }, 100);
+    };
+    socket.onmessage = ({ data }) => {
       try {
-        socket.send(JSON.stringify({ $, ...d }));
-      } catch (err) {
-        console.error(err);
+        data = JSON.parse(data) ?? {};
+      } catch {
+        data = {};
+      }
+      const { $ } = data;
+      pool.get($)?.(data);
+      pool.delete($);
+    };
+    const handleError = () => {
+      clearInterval(LOOP);
+      $uuid.textContent = 'error';
+      $uuid.style.setProperty('color', 'orangered');
+      $uuid.style.setProperty('cursor', 'pointer');
+      $uuid.onclick = () => {
+        location.reload();
+      };
+    };
+    socket.onclose = handleError;
+    socket.onerror = handleError;
+    $set.addEventListener('click', async () => {
+      if ($name.value) {
+        const { u } = await Combat.updateName($name.value);
+        refreshUser(u);
       }
     });
-  };
-
-  /** @type {Combat} */
-  const Combat = {
-    attack: (x, y) => send({ x, y }),
-    fetchUser: () => send({ u: 1 }),
-    fetchGame: () => send({ g: 1 }),
-    fetchUserGame: () => send({ u: 1, g: 1 }),
-    updateName: (n) => send({ n }),
-    updateHue: (h) => send({ h }),
-    log: (...args) => {
-      console.log(...args);
-      $logger.value += `${args
-        .map((x) => {
-          try {
-            return JSON.stringify(x);
-          } catch {
-            return x;
-          }
-        })
-        .join(' ')}\n`;
-    },
-  };
-
-  socket.onopen = async () => {
-    const { u, g } = await Combat.fetchUserGame();
-    refreshUser(u);
-    refreshGame(g);
-    loop = setInterval(async () => {
-      const { g } = await Combat.fetchGame();
-      refreshGame(g);
-    }, 100);
-  };
-  socket.onmessage = ({ data }) => {
-    try {
-      data = JSON.parse(data) ?? {};
-    } catch {
-      data = {};
-    }
-    const { $ } = data;
-    pool.get($)?.(data);
-    pool.delete($);
-  };
-  const handleError = () => {
-    clearInterval(loop);
-    $uuid.textContent = 'error';
-    $uuid.style.setProperty('color', 'orangered');
-    $uuid.style.setProperty('cursor', 'pointer');
-    $uuid.onclick = () => {
-      location.reload();
-    };
-  };
-  socket.onclose = handleError;
-  socket.onerror = handleError;
-
-  $set.addEventListener('click', async () => {
-    if ($name.value) {
-      const { u } = await Combat.updateName($name.value);
+    $color.addEventListener('click', async () => {
+      const { u } = await Combat.updateHue(Math.floor(Math.random() * 360));
       refreshUser(u);
-    }
-  });
-  $color.addEventListener('click', async () => {
-    const { u } = await Combat.updateHue(Math.floor(Math.random() * 360));
-    refreshUser(u);
-  });
-
-  $save.addEventListener('click', () => {
-    localStorage.setItem(CODE_KEY, editor?.getValue() || '');
-  });
-  $load.addEventListener('click', async () => {
-    editor?.setValue(await getValue());
-  });
-
-  const worker = new Worker('worker.js');
-  worker.onmessage = async ({ data: { $, n, a } }) => {
-    worker.postMessage({ $, d: await Combat[n]?.(...a) });
-  };
-
-  $run.addEventListener('click', () => {
-    worker.postMessage({
-      c: editor?.getValue(),
-      i: parseInt($int.value),
-      s: 'Combat',
-      f: Object.keys(Combat),
     });
-  });
-  $clear.addEventListener('click', () => {
-    $logger.value = '';
-  });
+    $save.addEventListener('click', () => {
+      localStorage.setItem(CODE_KEY, EDITOR?.getValue() || '');
+    });
+    $load.addEventListener('click', async () => {
+      EDITOR?.setValue(await getValue());
+    });
+    $run.addEventListener('click', () => {
+      worker.postMessage({
+        c: EDITOR?.getValue(),
+        i: parseInt($int.value),
+        s: 'Combat',
+        f: Object.keys(Combat),
+      });
+    });
+    $clear.addEventListener('click', () => {
+      $logger.value = '';
+    });
+    const worker = new Worker('worker.js');
+    worker.onmessage = async ({ data: { $, n, a } }) => {
+      worker.postMessage({ $, d: await Combat[n]?.(...a) });
+    };
+  }
 });

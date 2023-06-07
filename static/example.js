@@ -25,7 +25,7 @@ const Z = (c) =>
           GET(c.x + 1, c.y),
           GET(c.x, c.y - 1),
           GET(c.x - 1, c.y),
-        ].filter((d) => d.o && d.o !== u.u).length) /
+        ].filter((d) => d?.o && d.o !== u.u).length) /
       4
     : c.g
     ? g.s

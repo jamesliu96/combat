@@ -33,20 +33,17 @@ export class Cell {
     ].filter((c) => c && user.is(c.#owner)).length;
   }
 
-  get baseTakeTime() {
-    return this.#owner
+  #getTakeTime(user?: User) {
+    const base = this.#owner
       ? this.game.min +
-          (this.game.max - this.game.min) *
-            2 ** (-(this.game.now - this.#ownedAt) / this.game.conv)
+        (this.game.max - this.game.min) *
+          2 ** (-(this.game.now - this.#ownedAt) / this.game.conv)
       : this.game.idle;
-  }
-
-  getTakeTime(user?: User) {
-    if (!user) return this.baseTakeTime;
-    return (
-      this.baseTakeTime *
-      (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
-      this.game.energyRatio ** user.energy
+    if (!user) return base;
+    return Math.floor(
+      base *
+        (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
+        this.game.energyRatio ** user.energy
     );
   }
 
@@ -69,7 +66,7 @@ export class Cell {
   #attack(user: User) {
     this.#attacker = user;
     this.#attackedAt = this.game.now;
-    this.#takenAt = this.#attackedAt + this.getTakeTime(user);
+    this.#takenAt = this.#attackedAt + this.#getTakeTime(user);
     return true;
   }
 
@@ -84,8 +81,7 @@ export class Cell {
       c: this.#ownedAt,
       b: this.#attackedAt,
       u: this.#takenAt,
-      p: this.baseTakeTime,
-      t: this.getTakeTime(user),
+      t: this.#getTakeTime(user),
     };
   }
 }

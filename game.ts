@@ -15,7 +15,7 @@ export class Game {
     readonly energyCount = 0,
     readonly worth = 1,
     readonly goldWorth = 10,
-    readonly energyRatio = 0.99,
+    readonly energyRatio = 0.95,
     readonly idle = 2000,
     readonly min = 3000,
     readonly max = 30000,
@@ -48,12 +48,10 @@ export class Game {
       return new Cell(this, x, y, golds.has(idx), energies.has(idx));
     });
   }
-  #getCoords(idx: number) {
-    return {
-      x: idx % this.width,
-      y: Math.floor(idx / this.width),
-    };
-  }
+  #getCoords = (idx: number) => ({
+    x: idx % this.width,
+    y: Math.floor(idx / this.width),
+  });
 
   getCell(x: number, y: number) {
     if (x < 0 || x > this.width - 1 || y < 0 || y > this.height - 1) return;
@@ -67,9 +65,7 @@ export class Game {
 
   attack(x: number, y: number, user: User) {
     this.#update();
-    const cell = this.getCell(x, y);
-    if (cell) return cell.attack(user);
-    return false;
+    return this.getCell(x, y)?.attack(user) ?? false;
   }
 
   toJSON(user?: User): IGame {

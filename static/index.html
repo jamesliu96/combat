@@ -62,7 +62,7 @@
         border-radius: 4px;
         cursor: pointer;
       }
-      .uuid {
+      #uuid {
         color: lightgray;
         font-size: xx-small;
       }
@@ -81,7 +81,7 @@
         <div id="color" class="cell">0</div>
       </div>
       <div class="board"></div>
-      <div class="uuid"></div>
+      <div id="uuid"></div>
       <div id="editor"></div>
       <div class="logic">
         <button id="save">save</button>
@@ -103,6 +103,7 @@
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    <script src="uuid.js"></script>
     <script src="main.js"></script>
   </body>
 </html>

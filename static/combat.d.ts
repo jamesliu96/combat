@@ -34,9 +34,7 @@ interface ICell {
   b: number;
   /** Under attack until, to be claimed at timestamp (ms) */
   u: number;
-  /** Base time cost to occupy (ms) */
-  p: number;
-  /** User time cost to occupy (ms) */
+  /** Time cost to occupy (ms) */
   t: number;
 }
 
