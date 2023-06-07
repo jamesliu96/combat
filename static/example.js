@@ -37,6 +37,14 @@ const Z = (c) =>
  * @param {ICell} b
  */
 const COMP = (a, b) => Z(b) - Z(a) || (CT ? DIST(CT, a) - DIST(CT, b) : 0);
+/**
+ * @param {number} x
+ * @param {number} y
+ */
+const ATTACK = (x, y) => {
+  Combat.attack(x, y);
+  Combat.log({ x, y });
+};
 
 if (u.o) {
   const s = new Set();
@@ -53,14 +61,12 @@ if (u.o) {
   }
   if (s.size) {
     const { x, y } = Array.from(s).sort(COMP)[0];
-    Combat.attack(x, y);
-    Combat.log({ x, y });
+    ATTACK(x, y);
   }
 } else {
   const t = g.c.filter(({ a }) => !a).sort(COMP)[0];
   if (t) {
     const { x, y } = t;
-    Combat.attack(x, y);
-    Combat.log({ x, y });
+    ATTACK(x, y);
   }
 }

@@ -47,18 +47,19 @@ await new Application()
           }
           const { $, u, g, n, h, x, y } = data;
           const _: Record<string, unknown> = { $ };
-          if (u) _.u = getUser(u) ?? user;
+          if (u) _.u = user;
           if (g) _.g = game.toJSON(getUser(g) ?? user);
+          if (g === 0) _.g = game;
           if (typeof n === 'string') {
             const name = n.slice(0, 8);
-            user.name = name;
             log('name', user, `'${user.name}'`, '->', `'${name}'`);
+            user.name = name;
             _.u = user;
           }
           if (typeof h === 'number') {
             const hue = Math.floor(h % 360);
-            user.hue = hue;
             log('hue', user, user.hue, '->', hue);
+            user.hue = hue;
             _.u = user;
           }
           if (typeof x === 'number' && typeof y === 'number') {
@@ -91,7 +92,7 @@ await new Application()
     { port },
     {
       onListen: (listener) => {
-        console.log(
+        log(
           `server starts listening at :${(listener.addr as Deno.NetAddr).port}`
         );
       },

@@ -65,6 +65,7 @@
       #uuid {
         color: lightgray;
         font-size: xx-small;
+        user-select: all;
       }
       #editor {
         width: 100%;
@@ -92,12 +93,12 @@
           min="100"
           max="1000"
           step="100"
-          value="1000"
+          value="500"
+          placeholder="ms"
         />
-        <span class="text">ms</span>
         <button id="run">run</button>
       </div>
-      <textarea id="logger" cols="30" rows="10"></textarea>
+      <textarea id="logger" cols="30" rows="10" readonly></textarea>
       <div class="logic">
         <button id="clear">clear</button>
       </div>
