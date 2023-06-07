@@ -70,10 +70,10 @@ interface IGame {
 type Combat = {
   /** Attack a cell at \`(x,y)\` coordinate */
   attack: (x: number, y: number) => Promise<{ a: number }>;
-  /** Fetch current user */
-  fetchUser: () => Promise<{ u: IUser }>;
+  /** Fetch user */
+  fetchUser: (u?: string) => Promise<{ u: IUser }>;
   /** Fetch game */
-  fetchGame: () => Promise<{ g: IGame }>;
+  fetchGame: (u?: string) => Promise<{ g: IGame }>;
   /** Fetch current user & game */
   fetchUserGame: () => Promise<{ u: IUser; g: IGame }>;
   /** Update user nickname */

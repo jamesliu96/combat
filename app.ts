@@ -6,6 +6,11 @@ import { User } from './user.ts';
 
 const game = new Game(30, 30, 10, 10);
 
+const getUser = (v: unknown) =>
+  typeof v === 'string' && v
+    ? Array.from(game.users).find((u) => u.uuid === v)
+    : undefined;
+
 const log = (
   type: string,
   user?: User,
@@ -27,7 +32,7 @@ await new Application()
   .use(
     new Router()
       .get('/game', (ctx) => {
-        ctx.body = game;
+        ctx.body = game.toJSON(getUser(ctx.URL.searchParams.get('v')));
       })
       .get('/ws', (ctx) => {
         const socket = ctx.upgrade();
@@ -42,8 +47,8 @@ await new Application()
           }
           const { $, u, g, n, h, x, y } = data;
           const _: Record<string, unknown> = { $ };
-          if (u) _.u = user;
-          if (g) _.g = game.toJSON(user);
+          if (u) _.u = getUser(u) ?? user;
+          if (g) _.g = game.toJSON(getUser(g) ?? user);
           if (typeof n === 'string') {
             const name = n.slice(0, 8);
             user.name = name;

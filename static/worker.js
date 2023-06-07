@@ -2,6 +2,9 @@ importScripts('uuid.js');
 
 const AsyncFunction = async function () {}.constructor;
 
+/** @param {number} t */
+const sleep = (t) => new Promise((r) => setTimeout(r, t));
+
 const pool = new Map();
 const invoke = (n, a) => {
   const $ = crypto.randomUUID();
@@ -15,22 +18,25 @@ const invoke = (n, a) => {
   });
 };
 
-let int;
+let id;
 onmessage = ({ data: { $, d, c, i, s, f } }) => {
   if ($) {
     pool.get($)?.(d);
     pool.delete($);
     return;
   }
-  clearInterval(int);
+  const cid = crypto.randomUUID();
+  id = cid;
   pool.clear();
   const F = new AsyncFunction(s, c);
   const Combat = f.reduce(
     (acc, fn) => ({ ...acc, [fn]: (...args) => invoke(fn, args) }),
     {}
   );
-  F(Combat);
-  int = setInterval(() => {
-    F(Combat);
-  }, i);
+  (async () => {
+    while (cid === id) {
+      await F(Combat);
+      await sleep(i);
+    }
+  })();
 };
