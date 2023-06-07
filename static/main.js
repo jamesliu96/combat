@@ -32,7 +32,6 @@ addEventListener('load', () => {
     $color.style.setProperty('background', `hsl(${u.h}, 100%, 50%)`);
     $color.style.setProperty('color', `hsl(${reverseHue(u.h)}, 100%, 50%)`);
     $uuid.textContent = u.u;
-    $uuid.style.setProperty('color', null);
   };
   /** @param {IGame} g */
   const refreshGame = (g, v) => {
@@ -155,7 +154,7 @@ addEventListener('load', () => {
     document
       .querySelectorAll('.logic')
       .forEach(($e) => $e.style.setProperty('display', 'none'));
-    $uuid.style.setProperty('display', 'none');
+    $uuid.textContent = VIEW;
     $editor.style.setProperty('display', 'none');
     $logger.style.setProperty('display', 'none');
     const url = `game${VIEW ? `?v=${VIEW}` : ''}`;
@@ -239,7 +238,7 @@ addEventListener('load', () => {
     pool.delete($);
   };
   const handleError = () => {
-    $uuid.style.setProperty('color', 'orangered');
+    $board.style.setProperty('background', 'orangered');
   };
   socket.onclose = handleError;
   socket.onerror = handleError;
