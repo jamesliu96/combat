@@ -62,8 +62,8 @@ export class Cell {
 
   attack(user: User) {
     if (user.attacking.length || this.attacker) return false;
-    if (!user.occupied.length) return this.#attack(user);
-    if (user.is(this.owner) || this.#adj(user)) return this.#attack(user);
+    if (!user.occupied.length || user.is(this.owner) || this.#adj(user))
+      return this.#attack(user);
     return false;
   }
   #attack(user: User) {

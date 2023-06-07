@@ -3,7 +3,6 @@ if (u.a) return;
 const { g } = await Combat.fetchGame();
 
 /**
- * @param {IGame} g
  * @param {number} x
  * @param {number} y
  */
@@ -19,7 +18,20 @@ const CT = GET(Math.floor(g.w / 2), Math.floor(g.h / 2));
 const DIST = (a, b) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 /** @param {ICell} c */
 const Z = (c) =>
-  (c.o === u.u ? g.v / 4 : c.g ? g.s : c.e ? 1 / g.r : g.v) / c.t;
+  (c.o === u.u
+    ? (g.v *
+        [
+          GET(c.x, c.y + 1),
+          GET(c.x + 1, c.y),
+          GET(c.x, c.y - 1),
+          GET(c.x - 1, c.y),
+        ].filter((d) => d.o && d.o !== u.u).length) /
+      4
+    : c.g
+    ? g.s
+    : c.e
+    ? 1 / g.r
+    : g.v) / c.t;
 /**
  * @param {ICell} a
  * @param {ICell} b

@@ -1,10 +1,14 @@
 addEventListener('load', () => {
-  const LIB_URI = 'ts:types/game.d.ts';
   const CODE_KEY = 'combat.code';
 
+  let REMOTE_VALUE;
+  const getRemoteValue = async () => {
+    if (REMOTE_VALUE) return REMOTE_VALUE;
+    REMOTE_VALUE = await (await fetch('example.js')).text();
+    return REMOTE_VALUE;
+  };
   const getValue = async () =>
-    localStorage.getItem(CODE_KEY) ||
-    (await (await fetch('example.js')).text());
+    localStorage.getItem(CODE_KEY) || (await getRemoteValue());
 
   if (!('randomUUID' in crypto))
     crypto.randomUUID = function randomUUID() {
@@ -137,6 +141,7 @@ addEventListener('load', () => {
       noSyntaxValidation: false,
     });
     const LIB_SOURCE = await (await fetch('combat.d.ts')).text();
+    const LIB_URI = 'ts:combat.d.ts';
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
       LIB_SOURCE,
       LIB_URI
@@ -149,6 +154,7 @@ addEventListener('load', () => {
     editor = monaco.editor.create(document.querySelector('#editor'), {
       theme: 'vs-dark',
       language: 'javascript',
+      automaticLayout: true,
       tabSize: 2,
       value: await getValue(),
     });
@@ -179,7 +185,7 @@ addEventListener('load', () => {
     updateHue: (h) => send({ h }),
     log: (...args) => {
       console.log(...args);
-      $logger.textContent += `${args
+      $logger.value += `${args
         .map((x) => {
           try {
             return JSON.stringify(x);
@@ -254,6 +260,6 @@ addEventListener('load', () => {
     });
   });
   $clear.addEventListener('click', () => {
-    $logger.textContent = '';
+    $logger.value = '';
   });
 });

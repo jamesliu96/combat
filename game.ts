@@ -67,7 +67,9 @@ export class Game {
 
   attack(x: number, y: number, user: User) {
     this.#update();
-    return this.getCell(x, y)?.attack(user) ?? false;
+    const cell = this.getCell(x, y);
+    if (cell) return cell.attack(user);
+    return false;
   }
 
   toJSON(user?: User): IGame {
