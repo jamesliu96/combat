@@ -40,10 +40,10 @@ export class Cell {
           2 ** (-(this.game.now - this.#ownedAt) / this.game.conv)
       : this.game.idle;
     if (!user) return base;
-    return Math.floor(
+    return (
       base *
-        (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
-        this.game.energyRatio ** user.energy
+      (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
+      this.game.energyRatio ** user.energy
     );
   }
 
@@ -81,7 +81,7 @@ export class Cell {
       c: this.#ownedAt,
       b: this.#attackedAt,
       u: this.#takenAt,
-      t: this.#getTakeTime(user),
+      t: Math.round(this.#getTakeTime(user)),
     };
   }
 }
