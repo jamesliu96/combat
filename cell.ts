@@ -81,7 +81,7 @@ export class Cell {
       c: this.#ownedAt,
       b: this.#attackedAt,
       u: this.#takenAt,
-      t: Math.round(this.#getTakeTime(user)),
+      t: this.#getTakeTime(user),
     };
   }
 }
