@@ -66,7 +66,8 @@ addEventListener('load', () => {
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
           $cell.className = 'cell';
-          if (v) $cell.style.setProperty('cursor', 'default');
+          if (typeof v !== 'undefined')
+            $cell.style.setProperty('cursor', 'default');
           else {
             const { x, y } = g.c[idx];
             $cell.onclick = () => {
@@ -105,6 +106,13 @@ addEventListener('load', () => {
             : null
         );
         $cell.textContent = (c.t / 1e3).toFixed();
+        $cell.style.setProperty(
+          'font-weight',
+          (v && (c.o === v || c.a === v)) ||
+            (Combat._uuid && (c.o === Combat._uuid || c.a === Combat._uuid))
+            ? 'bold'
+            : null
+        );
       }
     });
     const ranking = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
@@ -190,7 +198,7 @@ addEventListener('load', () => {
             ? [
                 Combat.fetchGame(view)
                   .then(({ g }) => {
-                    refreshGame(g, true);
+                    refreshGame(g, view);
                   })
                   .catch((err) => {
                     console.error(err);
