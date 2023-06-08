@@ -42,19 +42,34 @@
         border-radius: 6px;
         counter-reset: rank;
       }
-      .rank > div {
+      .player {
+        counter-increment: rank;
         padding: 4px;
         border-radius: 4px;
-        counter-increment: rank;
+        cursor: pointer;
+        pointer-events: none;
       }
-      .rank > div::before {
+      .player::before {
         content: counter(rank) ': ';
         color: lightslategray;
+      }
+      .player.attack {
+        text-decoration: underline;
+      }
+      .player.self {
+        font-weight: bold;
+      }
+      .player.active {
+        pointer-events: auto;
       }
       .logic {
         display: flex;
         align-items: center;
         gap: 4px;
+      }
+      #color {
+        background: hsl(var(--h), 100%, 50%);
+        color: hsl(var(--r), 100%, 50%);
       }
       .board {
         display: grid;
@@ -70,11 +85,28 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: white;
+        background: linear-gradient(
+          0deg,
+          var(--co) var(--p),
+          var(--ca) var(--p)
+        );
+        color: black;
         font-size: 12px;
         line-height: 1;
         border-radius: 4px;
         cursor: pointer;
+      }
+      .cell.stale {
+        pointer-events: none;
+      }
+      .cell.gold {
+        box-shadow: gold 0 0 5px 0 inset, gold 0 0 5px 1px;
+      }
+      .cell.energy {
+        box-shadow: skyblue 0 0 5px 0 inset, skyblue 0 0 5px 1px;
+      }
+      .cell.self {
+        font-weight: bold;
       }
       #uuid {
         color: lightgray;

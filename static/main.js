@@ -43,8 +43,8 @@ addEventListener('load', () => {
   /** @param {IUser} u */
   const refreshUser = (u) => {
     $name.value = u.n;
-    $color.style.setProperty('background', `hsl(${u.h}deg, 100%, 50%)`);
-    $color.style.setProperty('color', `hsl(${reverseHue(u.h)}deg, 100%, 50%)`);
+    $color.style.setProperty('--h', `${u.h}deg`);
+    $color.style.setProperty('--r', `${reverseHue(u.h)}deg`);
     $uuid.textContent = u.u;
   };
   /** @param {IGame} g */
@@ -66,14 +66,11 @@ addEventListener('load', () => {
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
           $cell.className = 'cell';
-          if (typeof v !== 'undefined')
-            $cell.style.setProperty('cursor', 'default');
-          else {
-            const { x, y } = g.c[idx];
-            $cell.onclick = () => {
-              Combat.attack(x, y);
-            };
-          }
+          const { x, y } = g.c[idx];
+          $cell.onclick = () => {
+            Combat.attack(x, y);
+          };
+          if (typeof v !== 'undefined') $cell.classList.add('stale');
           return $cell;
         })
       );
@@ -86,69 +83,64 @@ addEventListener('load', () => {
         const hueA = getHue(c.a);
         const perc = (c.a ? (c.u - g.t) / (c.u - c.b) : 1) * 100;
         $cell.style.setProperty(
-          'background',
-          `linear-gradient(0deg, ${
-            typeof hueO === 'number'
-              ? `hsl(${hueO}deg, 100%, ${
-                  100 - ((c.t - g.a) / (g.z - g.a)) * 50
-                }%)`
-              : 'white'
-          } ${perc}%,${
-            typeof hueA === 'number' ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
-          } ${perc}%)`
+          '--co',
+          typeof hueO === 'number'
+            ? `hsl(${hueO}deg, 100%, ${
+                100 - ((c.t - g.a) / (g.z - g.a)) * 50
+              }%)`
+            : 'white'
         );
+        $cell.style.setProperty(
+          '--ca',
+          typeof hueA === 'number' ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
+        );
+        $cell.style.setProperty('--p', `${perc}%`);
         $cell.style.setProperty(
           'color',
           typeof hueO === 'number'
             ? `hsl(${reverseHue(hueO)}deg, 100%, 50%)`
             : null
         );
-        $cell.style.setProperty(
-          'box-shadow',
-          c.g
-            ? 'gold 0 0 5px 0 inset, gold 0 0 5px 1px'
-            : c.e
-            ? 'skyblue 0 0 5px 0 inset, skyblue 0 0 5px 1px'
-            : null
-        );
-        $cell.textContent = (c.t / 1e3).toFixed();
-        $cell.style.setProperty(
-          'font-weight',
+        if (c.g) $cell.classList.add('gold');
+        else $cell.classList.remove('gold');
+        if (c.e) $cell.classList.add('energy');
+        else $cell.classList.remove('energy');
+        if (
           (v && (c.o === v || c.a === v)) ||
-            (Combat._uuid && (c.o === Combat._uuid || c.a === Combat._uuid))
-            ? 'bold'
-            : null
-        );
+          (Combat._uuid && (c.o === Combat._uuid || c.a === Combat._uuid))
+        )
+          $cell.classList.add('self');
+        else $cell.classList.remove('self');
+        $cell.textContent = (c.t / 1e3).toFixed();
       }
     });
-    const ranking = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
-    Array.from($rank.children).forEach(($r, idx) => {
-      const r = ranking[idx];
+    const rank = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
+    Array.from($rank.children).forEach(($p, idx) => {
+      const r = rank[idx];
       const hue = getHue(r?.u);
-      $r.style.setProperty(
+      $p.style.setProperty(
         'background',
         typeof hue === 'number' ? `hsl(${hue}deg, 100%, 50%)` : null
       );
-      $r.style.setProperty(
+      $p.style.setProperty(
         'color',
         typeof hue === 'number' ? `hsl(${reverseHue(hue)}deg, 100%, 50%)` : null
       );
-      $r.style.setProperty('text-decoration', r?.a ? 'underline' : null);
-      $r.style.setProperty(
-        'font-weight',
-        (v && r?.u === v) || (Combat._uuid && r?.u === Combat._uuid)
-          ? 'bold'
-          : null
-      );
-      $r.textContent = r
-        ? `${r.n || r.u.slice(0, 8)} ($${r.s}) [#${r.o}] [*${r.e}]`
-        : '';
-      $r.onclick = r
+      if (r?.a) $p.classList.add('attack');
+      else $p.classList.remove('attack');
+      if ((v && r?.u === v) || (Combat._uuid && r?.u === Combat._uuid))
+        $p.classList.add('self');
+      else $p.classList.remove('self');
+      if (r) $p.classList.add('active');
+      else $p.classList.remove('active');
+      $p.onclick = r
         ? () => {
             open(`?view=${r.u}`);
           }
         : null;
-      $r.style.setProperty('cursor', r ? 'pointer' : null);
+      $p.textContent = r
+        ? `${r.n || r.u.slice(0, 8)} ($${r.s}) [#${r.o}] [*${r.e}]`
+        : '';
     });
   };
 
@@ -165,9 +157,10 @@ addEventListener('load', () => {
   $rank.style.setProperty('--w', '3');
   $rank.append(
     ...Array.from(Array(9), () => {
-      const $r = document.createElement('div');
-      $r.title = '$: score; #: occupied; *: energy';
-      return $r;
+      const $p = document.createElement('div');
+      $p.className = 'player';
+      $p.title = '$: score; #: occupied; *: energy';
+      return $p;
     })
   );
   const $name = document.querySelector('#name');
@@ -274,6 +267,24 @@ addEventListener('load', () => {
       run: handleRun,
     });
   });
+  (async () => {
+    for (;;) {
+      await Promise.all([
+        sleep(100),
+        ...($update.checked
+          ? [
+              Combat.fetchGame()
+                .then(({ g }) => {
+                  refreshGame(g);
+                })
+                .catch((err) => {
+                  console.error(err);
+                }),
+            ]
+          : []),
+      ]);
+    }
+  })();
   const pool = new Map();
   const send = (d) => {
     const $ = crypto.randomUUID();
@@ -295,24 +306,6 @@ addEventListener('load', () => {
     const { u } = await Combat.fetchUser();
     Combat._uuid = u.u;
     refreshUser(u);
-    (async () => {
-      for (;;) {
-        await Promise.all([
-          sleep(100),
-          ...($update.checked
-            ? [
-                Combat.fetchGame()
-                  .then(({ g }) => {
-                    refreshGame(g);
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                  }),
-              ]
-            : []),
-        ]);
-      }
-    })();
   };
   socket.onmessage = ({ data }) => {
     try {
