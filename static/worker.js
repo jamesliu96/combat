@@ -38,11 +38,11 @@ onmessage = ({ data: { $, d, c, i, x, s, f } }) => {
   (async () => {
     while (cid === id) {
       await Promise.all([
+        sleep(i),
         F(Combat).catch((err) => {
           console.error(err);
           if (!x) throw err;
         }),
-        sleep(i),
       ]);
     }
   })();
