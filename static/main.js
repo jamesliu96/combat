@@ -139,6 +139,7 @@ addEventListener('load', () => {
   };
 
   const $rank = document.querySelector('.rank');
+  $rank.style.setProperty('--w', '3');
   $rank.append(
     ...Array.from(Array(9), () => {
       const $r = document.createElement('div');

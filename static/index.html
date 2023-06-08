@@ -15,22 +15,22 @@
       }
       .rank {
         display: grid;
-        grid-template-rows: repeat(3, auto);
+        grid-template-rows: repeat(var(--w), auto);
         grid-auto-flow: column;
         gap: 8px;
-        padding: 12px;
+        padding: 10px;
         font-size: 14px;
         line-height: 1;
         background-color: lightgray;
-        border-radius: 4px;
+        border-radius: 6px;
         counter-reset: rank;
       }
       .rank > div {
         padding: 4px;
         border-radius: 4px;
+        counter-increment: rank;
       }
       .rank > div::before {
-        counter-increment: rank;
         content: counter(rank) ': ';
         color: lightslategray;
       }
