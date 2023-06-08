@@ -24,17 +24,17 @@ interface ICell {
   g: 0 | 1;
   /** Energy binary */
   e: 0 | 1;
-  /** Owner's UUID, empty if unclaimed */
+  /** Owner's UUID */
   o: string;
-  /** Attacker's UUID, empty if at peace */
+  /** Attacker's UUID */
   a: string;
-  /** Claimed at timestamp (ms) */
+  /** Claimed at */
   c: number;
-  /** Attack begins at timestamp (ms) */
+  /** Attacked at */
   b: number;
-  /** Under attack until, to be claimed at timestamp (ms) */
+  /** To be claimed at */
   u: number;
-  /** Time cost to occupy (ms) */
+  /** Time cost to occupy */
   t: number;
 }
 
@@ -53,17 +53,17 @@ interface IGame {
   s: number;
   /** Energy ratio */
   r: number;
-  /** Idle take time (ms) */
+  /** Idle take time */
   i: number;
-  /** Minimum take time (ms) */
+  /** Minimum take time */
   a: number;
-  /** Maximum take time (ms) */
+  /** Maximum take time */
   z: number;
   /** Cells */
   c: ICell[];
   /** Users */
   u: IUser[];
-  /** Current time (ms) */
+  /** Time */
   t: number;
 }
 

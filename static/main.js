@@ -144,6 +144,10 @@ addEventListener('load', () => {
     $ping.style.setProperty('visibility', 'hidden');
   };
   const $update = document.querySelector('#update');
+  addEventListener('keydown', (e) => {
+    if ((e.key === '.' || e.code === 'Period') && (e.ctrlKey || e.metaKey))
+      $update.click();
+  });
   const $rank = document.querySelector('.rank');
   $rank.style.setProperty('--w', '3');
   $rank.append(
@@ -232,6 +236,30 @@ addEventListener('load', () => {
       tabSize: 2,
       value: await getValue(),
     });
+    editor.addAction({
+      id: 'combat-save',
+      label: 'Save',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 4,
+      run: handleSave,
+    });
+    editor.addAction({
+      id: 'combat-load',
+      label: 'Load',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 5,
+      run: handleLoad,
+    });
+    editor.addAction({
+      id: 'combat-run',
+      label: 'Run',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 6,
+      run: handleRun,
+    });
   });
   const pool = new Map();
   const send = (d) => {
@@ -299,13 +327,15 @@ addEventListener('load', () => {
     const h = parseInt(prompt('Hue'));
     if (Number.isInteger(h)) refreshUser((await Combat.updateHue(h)).u);
   };
-  $save.onclick = () => {
+  const handleSave = () => {
     localStorage.setItem(CODE_KEY, editor?.getValue() || '');
   };
-  $load.onclick = async () => {
+  $save.onclick = handleSave;
+  const handleLoad = async () => {
     editor?.setValue(await getValue());
   };
-  $run.onclick = () => {
+  $load.onclick = handleLoad;
+  const handleRun = () => {
     worker.postMessage({
       c: editor?.getValue(),
       i: parseInt($int.value) || 1e3,
@@ -314,6 +344,7 @@ addEventListener('load', () => {
       f: Object.keys(Combat).filter((x) => !x.startsWith('_')),
     });
   };
+  $run.onclick = handleRun;
   $clear.onclick = () => {
     $logger.value = '';
   };
