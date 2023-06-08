@@ -47,13 +47,9 @@ addEventListener('load', () => {
     $color.style.setProperty('color', `hsl(${reverseHue(u.h)}, 100%, 50%)`);
     $uuid.textContent = u.u;
   };
-  let ts = Date.now();
   /** @param {IGame} g */
   const refreshGame = (g, v) => {
-    const t = Date.now();
-    $fps.textContent = (1000 / (t - ts)).toFixed();
-    ts = t;
-    $ping.textContent = `${(t - g.t).toFixed()}ms`;
+    $ping.textContent = `${(Date.now() - g.t).toFixed()}ms`;
     const hues = {};
     const getHue = (id) => {
       if (!id) return;
@@ -108,7 +104,7 @@ addEventListener('load', () => {
             ? 'skyblue 0 0 5px 0 inset, skyblue 0 0 5px 1px'
             : null
         );
-        $cell.textContent = (c.t / 1000).toFixed();
+        $cell.textContent = (c.t / 1e3).toFixed();
       }
     });
     const ranking = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
@@ -143,12 +139,11 @@ addEventListener('load', () => {
     });
   };
 
-  const $diagnostics = document.querySelector('.diagnostics');
-  $diagnostics.ondblclick = () => {
-    $diagnostics.style.setProperty('visibility', 'hidden');
-  };
-  const $fps = document.querySelector('#fps');
   const $ping = document.querySelector('#ping');
+  $ping.ondblclick = () => {
+    $ping.style.setProperty('visibility', 'hidden');
+  };
+  const $update = document.querySelector('#update');
   const $rank = document.querySelector('.rank');
   $rank.style.setProperty('--w', '3');
   $rank.append(
@@ -175,25 +170,29 @@ addEventListener('load', () => {
   const $logger = document.querySelector('#logger');
   const $clear = document.querySelector('#clear');
 
-  const VIEW = new URLSearchParams(location.search).get('view');
-  if (VIEW !== null) {
+  const view = new URLSearchParams(location.search).get('view');
+  if (view !== null) {
     document
       .querySelectorAll('.logic')
       .forEach(($e) => $e.style.setProperty('display', 'none'));
-    $uuid.textContent = VIEW;
+    $uuid.textContent = view;
     $editor.style.setProperty('display', 'none');
     $logger.style.setProperty('display', 'none');
     (async () => {
       for (;;) {
         await Promise.all([
-          Combat.fetchGame(VIEW)
-            .then(({ g }) => {
-              refreshGame(g, true);
-            })
-            .catch((err) => {
-              console.error(err);
-            }),
           sleep(100),
+          ...($update.checked
+            ? [
+                Combat.fetchGame(view)
+                  .then(({ g }) => {
+                    refreshGame(g, true);
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                  }),
+              ]
+            : []),
         ]);
       }
     })();
@@ -258,14 +257,18 @@ addEventListener('load', () => {
     (async () => {
       for (;;) {
         await Promise.all([
-          Combat.fetchGame()
-            .then(({ g }) => {
-              refreshGame(g);
-            })
-            .catch((err) => {
-              console.error(err);
-            }),
           sleep(100),
+          ...($update.checked
+            ? [
+                Combat.fetchGame()
+                  .then(({ g }) => {
+                    refreshGame(g);
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                  }),
+              ]
+            : []),
         ]);
       }
     })();
@@ -305,7 +308,7 @@ addEventListener('load', () => {
   $run.onclick = () => {
     worker.postMessage({
       c: editor?.getValue(),
-      i: parseInt($int.value) || 1000,
+      i: parseInt($int.value) || 1e3,
       x: $hasty.checked,
       s: 'Combat',
       f: Object.keys(Combat).filter((x) => !x.startsWith('_')),

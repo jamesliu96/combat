@@ -9,15 +9,21 @@
         font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
         user-select: none;
       }
-      .diagnostics {
+      #ping {
         position: fixed;
         top: 0;
         left: 0;
-        opacity: 0.4;
+        opacity: 0.5;
         padding: 2px;
         background: black;
         color: white;
         font-size: x-small;
+      }
+      #update {
+        position: fixed;
+        top: 0;
+        right: 0;
+        opacity: 0.5;
       }
       .game {
         display: flex;
@@ -83,10 +89,8 @@
     </style>
   </head>
   <body>
-    <div class="diagnostics">
-      <div>FPS <span id="fps"></span></div>
-      <div>ping <span id="ping"></span></div>
-    </div>
+    <div id="ping"></div>
+    <input type="checkbox" id="update" checked title="update" />
     <div class="game">
       <div class="rank"></div>
       <div class="logic">
