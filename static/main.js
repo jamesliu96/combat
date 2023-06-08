@@ -66,11 +66,13 @@ addEventListener('load', () => {
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
           $cell.className = 'cell';
-          const { x, y } = g.c[idx];
-          $cell.onclick = () => {
-            Combat.attack(x, y);
-          };
           if (typeof v !== 'undefined') $cell.classList.add('stale');
+          else {
+            const { x, y } = g.c[idx];
+            $cell.onclick = () => {
+              Combat.attack(x, y);
+            };
+          }
           return $cell;
         })
       );
@@ -95,12 +97,7 @@ addEventListener('load', () => {
           typeof hueA === 'number' ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
         );
         $cell.style.setProperty('--p', `${perc}%`);
-        $cell.style.setProperty(
-          'color',
-          typeof hueO === 'number'
-            ? `hsl(${reverseHue(hueO)}deg, 100%, 50%)`
-            : null
-        );
+        $cell.style.setProperty('--h', `${reverseHue(hueO)}deg`);
         if (c.g) $cell.classList.add('gold');
         else $cell.classList.remove('gold');
         if (c.e) $cell.classList.add('energy');
@@ -118,14 +115,8 @@ addEventListener('load', () => {
     Array.from($rank.children).forEach(($p, idx) => {
       const r = rank[idx];
       const hue = getHue(r?.u);
-      $p.style.setProperty(
-        'background',
-        typeof hue === 'number' ? `hsl(${hue}deg, 100%, 50%)` : null
-      );
-      $p.style.setProperty(
-        'color',
-        typeof hue === 'number' ? `hsl(${reverseHue(hue)}deg, 100%, 50%)` : null
-      );
+      $p.style.setProperty('--h', `${hue}deg`);
+      $p.style.setProperty('--r', `${reverseHue(hue)}deg`);
       if (r?.a) $p.classList.add('attack');
       else $p.classList.remove('attack');
       if ((v && r?.u === v) || (Combat._uuid && r?.u === Combat._uuid))
