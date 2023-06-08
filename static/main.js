@@ -47,8 +47,13 @@ addEventListener('load', () => {
     $color.style.setProperty('color', `hsl(${reverseHue(u.h)}, 100%, 50%)`);
     $uuid.textContent = u.u;
   };
+  let ts = Date.now();
   /** @param {IGame} g */
   const refreshGame = (g, v) => {
+    const t = Date.now();
+    $fps.textContent = (1000 / (t - ts)).toFixed();
+    ts = t;
+    $ping.textContent = `${(t - g.t).toFixed()}ms`;
     const hues = {};
     const getHue = (id) => {
       if (!id) return;
@@ -98,9 +103,9 @@ addEventListener('load', () => {
         $cell.style.setProperty(
           'box-shadow',
           c.g
-            ? 'gold 0px 0px 5px 0px inset, gold 0px 0px 5px 1px'
+            ? 'gold 0 0 5px 0 inset, gold 0 0 5px 1px'
             : c.e
-            ? 'skyblue 0px 0px 5px 0px inset, skyblue 0px 0px 5px 1px'
+            ? 'skyblue 0 0 5px 0 inset, skyblue 0 0 5px 1px'
             : null
         );
         $cell.textContent = (c.t / 1000).toFixed();
@@ -138,6 +143,12 @@ addEventListener('load', () => {
     });
   };
 
+  const $diagnostics = document.querySelector('.diagnostics');
+  $diagnostics.ondblclick = () => {
+    $diagnostics.style.setProperty('visibility', 'hidden');
+  };
+  const $fps = document.querySelector('#fps');
+  const $ping = document.querySelector('#ping');
   const $rank = document.querySelector('.rank');
   $rank.style.setProperty('--w', '3');
   $rank.append(
@@ -165,7 +176,6 @@ addEventListener('load', () => {
   const $clear = document.querySelector('#clear');
 
   const VIEW = new URLSearchParams(location.search).get('view');
-
   if (VIEW !== null) {
     document
       .querySelectorAll('.logic')

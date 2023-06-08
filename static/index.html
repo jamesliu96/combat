@@ -5,12 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Combat</title>
     <style>
+      body {
+        font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
+        user-select: none;
+      }
+      .diagnostics {
+        position: fixed;
+        top: 0;
+        left: 0;
+        opacity: 0.4;
+        padding: 2px;
+        background: black;
+        color: white;
+        font-size: x-small;
+      }
       .game {
         display: flex;
         flex-direction: column;
         align-items: center;
-        user-select: none;
-        font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
         gap: 10px;
       }
       .rank {
@@ -38,9 +50,6 @@
         display: flex;
         align-items: center;
         gap: 4px;
-      }
-      .text {
-        font-size: 12px;
       }
       .board {
         display: grid;
@@ -74,14 +83,18 @@
     </style>
   </head>
   <body>
+    <div class="diagnostics">
+      <div>FPS <span id="fps"></span></div>
+      <div>ping <span id="ping"></span></div>
+    </div>
     <div class="game">
       <div class="rank"></div>
       <div class="logic">
-        <input type="text" id="name" maxlength="8" placeholder="nickname" />
+        <input id="name" maxlength="8" placeholder="nickname" />
         <button id="set">set</button>
         <div id="color" class="cell">0</div>
       </div>
-      <div class="board"></div>
+      <div class="board">🍄</div>
       <div id="uuid"></div>
       <div id="editor"></div>
       <div class="logic">
