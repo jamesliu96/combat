@@ -6,11 +6,6 @@ import { User } from './user.ts';
 
 const game = new Game(30, 30, 10, 10);
 
-const getUser = (v: unknown) =>
-  typeof v === 'string' && v
-    ? Array.from(game.users).find((u) => u.uuid === v)
-    : undefined;
-
 const log = (
   type: string,
   user?: User,
@@ -28,13 +23,18 @@ const log = (
 const args = parse<{ p: unknown; port: unknown }>(Deno.args);
 const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
 
+const getUser = (v: unknown) =>
+  typeof v === 'string' && v
+    ? Array.from(game.users).find((u) => u.uuid === v)
+    : undefined;
+
 await new Application()
   .use(
     new Router()
-      .get('/game', (ctx) => {
+      .get('/g', (ctx) => {
         ctx.body = game.toJSON(getUser(ctx.URL.searchParams.get('v')));
       })
-      .get('/ws', (ctx) => {
+      .get('/s', (ctx) => {
         const socket = ctx.upgrade();
         const user = new User(game);
         game.users.add(user);
@@ -45,11 +45,9 @@ await new Application()
           } catch {
             data = {};
           }
-          const { $, u, g, n, h, x, y } = data;
+          const { $, u, n, h, x, y } = data;
           const _: Record<string, unknown> = { $ };
           if (u) _.u = user;
-          if (g) _.g = game.toJSON(getUser(g) ?? user);
-          if (g === 0) _.g = game;
           if (typeof n === 'string') {
             const name = n.slice(0, 8);
             log('name', user, `'${user.name}'`, '->', `'${name}'`);

@@ -10,18 +10,18 @@ const sleep = (t = 0) =>
 const pool = new Map();
 const invoke = (n, a) => {
   const $ = crypto.randomUUID();
-  return new Promise((r) => {
-    pool.set($, r);
+  return new Promise((resolve, reject) => {
+    pool.set($, resolve);
     try {
       postMessage({ $, n, a });
     } catch (err) {
-      console.error(err);
+      reject(err);
     }
   });
 };
 
 let id;
-onmessage = ({ data: { $, d, c, i, s, f } }) => {
+onmessage = ({ data: { $, d, c, i, x, s, f } }) => {
   if ($) {
     pool.get($)?.(d);
     pool.delete($);
@@ -37,8 +37,13 @@ onmessage = ({ data: { $, d, c, i, s, f } }) => {
   );
   (async () => {
     while (cid === id) {
-      await F(Combat);
-      await sleep(i);
+      await Promise.all([
+        F(Combat).catch((err) => {
+          console.error(err);
+          if (!x) throw err;
+        }),
+        sleep(i),
+      ]);
     }
   })();
 };

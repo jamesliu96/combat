@@ -6,25 +6,25 @@ const { g } = await Combat.fetchGame();
  * @param {number} x
  * @param {number} y
  */
-const GET = (x, y) => {
+const get = (x, y) => {
   if (x < 0 || x > g.w - 1 || y < 0 || y > g.h - 1) return;
   return g.c[x + y * g.w];
 };
-const CT = GET(Math.floor(g.w / 2), Math.floor(g.h / 2));
+const CT = get(Math.floor(g.w / 2), Math.floor(g.h / 2));
 /**
  * @param {ICell} a
  * @param {ICell} b
  */
-const DIST = (a, b) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+const dist = (a, b) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 /** @param {ICell} c */
-const Z = (c) =>
+const z = (c) =>
   (c.o === u.u
     ? (g.v *
         [
-          GET(c.x, c.y + 1),
-          GET(c.x + 1, c.y),
-          GET(c.x, c.y - 1),
-          GET(c.x - 1, c.y),
+          get(c.x, c.y + 1),
+          get(c.x + 1, c.y),
+          get(c.x, c.y - 1),
+          get(c.x - 1, c.y),
         ].filter((d) => d?.o && d.o !== u.u).length) /
       4
     : c.g
@@ -36,14 +36,14 @@ const Z = (c) =>
  * @param {ICell} a
  * @param {ICell} b
  */
-const COMP = (a, b) => Z(b) - Z(a) || (CT ? DIST(CT, a) - DIST(CT, b) : 0);
+const COMP = (a, b) => z(b) - z(a) || (CT ? dist(CT, a) - dist(CT, b) : 0);
 /**
  * @param {number} x
  * @param {number} y
  */
-const ATTACK = (x, y) => {
-  Combat.attack(x, y);
-  Combat.log({ x, y });
+const attack = async (x, y) => {
+  const { a } = await Combat.attack(x, y);
+  Combat.log({ x, y }, Boolean(a));
 };
 
 if (u.o) {
@@ -52,21 +52,21 @@ if (u.o) {
     const { x, y } = c;
     for (const j of [
       c,
-      GET(x, y + 1),
-      GET(x + 1, y),
-      GET(x, y - 1),
-      GET(x - 1, y),
+      get(x, y + 1),
+      get(x + 1, y),
+      get(x, y - 1),
+      get(x - 1, y),
     ])
       if (j && !j.a) s.add(j);
   }
   if (s.size) {
     const { x, y } = Array.from(s).sort(COMP)[0];
-    ATTACK(x, y);
+    attack(x, y);
   }
 } else {
   const t = g.c.filter(({ a }) => !a).sort(COMP)[0];
   if (t) {
     const { x, y } = t;
-    ATTACK(x, y);
+    attack(x, y);
   }
 }

@@ -67,7 +67,7 @@ interface IGame {
   t: number;
 }
 
-type Combat = {
+interface Combat {
   /** Attack a cell */
   attack: (x: number, y: number) => Promise<{ a: 0 | 1 }>;
   /** Fetch user */
@@ -80,6 +80,6 @@ type Combat = {
   updateHue: (h: number) => Promise<{ u: IUser }>;
   /** Output log */
   log: (...args: unknown[]) => Promise<void>;
-};
+}
 
 declare const Combat: Combat;

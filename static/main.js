@@ -1,9 +1,23 @@
 addEventListener('load', () => {
   /** @type {Combat} */
   const Combat = {
+    _uuid: '',
     attack: (x, y) => send({ x, y }),
     fetchUser: () => send({ u: 1 }),
-    fetchGame: (u) => send({ g: u === 0 || u === null ? 0 : u || 1 }),
+    async fetchGame(u) {
+      const v = u === 0 || u === null ? undefined : u || this._uuid;
+      return {
+        g: await (
+          await fetch(
+            v
+              ? `g?${new URLSearchParams({
+                  v,
+                })}`
+              : 'g'
+          )
+        ).json(),
+      };
+    },
     updateName: (n) => send({ n }),
     updateHue: (h) => send({ h }),
     log: (...args) => {
@@ -38,7 +52,7 @@ addEventListener('load', () => {
     const hues = {};
     const getHue = (id) => {
       if (!id) return;
-      if (id in hues) return hues[id];
+      if (hues[id]) return hues[id];
       const hue = g.u.find(({ u }) => u === id)?.h;
       if (hue) {
         hues[id] = hue;
@@ -144,6 +158,7 @@ addEventListener('load', () => {
   const $save = document.querySelector('#save');
   const $load = document.querySelector('#load');
   const $int = document.querySelector('#int');
+  const $hasty = document.querySelector('#hasty');
   const $run = document.querySelector('#run');
   const $logger = document.querySelector('#logger');
   const $clear = document.querySelector('#clear');
@@ -157,11 +172,18 @@ addEventListener('load', () => {
     $uuid.textContent = VIEW;
     $editor.style.setProperty('display', 'none');
     $logger.style.setProperty('display', 'none');
-    const url = `game${VIEW ? `?v=${VIEW}` : ''}`;
     (async () => {
       for (;;) {
-        refreshGame(await (await fetch(url)).json(), true);
-        await sleep(100);
+        await Promise.all([
+          Combat.fetchGame(VIEW)
+            .then(({ g }) => {
+              refreshGame(g, true);
+            })
+            .catch((err) => {
+              console.error(err);
+            }),
+          sleep(100),
+        ]);
       }
     })();
     return;
@@ -204,28 +226,38 @@ addEventListener('load', () => {
   const pool = new Map();
   const send = (d) => {
     const $ = crypto.randomUUID();
-    return new Promise((r) => {
-      pool.set($, r);
+    return new Promise((resolve, reject) => {
+      pool.set($, resolve);
       try {
         socket.send(JSON.stringify({ $, ...d }));
       } catch (err) {
-        console.error(err);
+        reject(err);
       }
     });
   };
   const socket = new WebSocket(
     `${location.protocol.startsWith('https') ? 'wss:' : 'ws:'}//${
       location.host
-    }/ws`
+    }${location.pathname}/../s`
   );
   socket.onopen = async () => {
+    const { u } = await Combat.fetchUser();
+    Combat._uuid = u.u;
+    refreshUser(u);
     (async () => {
       for (;;) {
-        refreshGame((await Combat.fetchGame()).g);
-        await sleep(100);
+        await Promise.all([
+          Combat.fetchGame()
+            .then(({ g }) => {
+              refreshGame(g);
+            })
+            .catch((err) => {
+              console.error(err);
+            }),
+          sleep(100),
+        ]);
       }
     })();
-    refreshUser((await Combat.fetchUser()).u);
   };
   socket.onmessage = ({ data }) => {
     try {
@@ -263,8 +295,9 @@ addEventListener('load', () => {
     worker.postMessage({
       c: editor?.getValue(),
       i: parseInt($int.value) || 1000,
+      x: $hasty.checked,
       s: 'Combat',
-      f: Object.keys(Combat),
+      f: Object.keys(Combat).filter((x) => !x.startsWith('_')),
     });
   };
   $clear.onclick = () => {
