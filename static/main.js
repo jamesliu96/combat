@@ -43,19 +43,19 @@ addEventListener('load', () => {
   /** @param {IUser} u */
   const refreshUser = (u) => {
     $name.value = u.n;
-    $color.style.setProperty('background', `hsl(${u.h}, 100%, 50%)`);
-    $color.style.setProperty('color', `hsl(${reverseHue(u.h)}, 100%, 50%)`);
+    $color.style.setProperty('background', `hsl(${u.h}deg, 100%, 50%)`);
+    $color.style.setProperty('color', `hsl(${reverseHue(u.h)}deg, 100%, 50%)`);
     $uuid.textContent = u.u;
   };
   /** @param {IGame} g */
   const refreshGame = (g, v) => {
-    $ping.textContent = `${(Date.now() - g.t).toFixed()}ms`;
+    $ping.textContent = (Date.now() - g.t).toFixed();
     const hues = {};
     const getHue = (id) => {
       if (!id) return;
-      if (hues[id]) return hues[id];
+      if (typeof hues[id] === 'number') return hues[id];
       const hue = g.u.find(({ u }) => u === id)?.h;
-      if (hue) {
+      if (typeof hue === 'number') {
         hues[id] = hue;
         return hue;
       }
@@ -88,14 +88,20 @@ addEventListener('load', () => {
         $cell.style.setProperty(
           'background',
           `linear-gradient(0deg, ${
-            hueO
-              ? `hsl(${hueO}, 100%, ${100 - ((c.t - g.a) / (g.z - g.a)) * 50}%)`
+            typeof hueO === 'number'
+              ? `hsl(${hueO}deg, 100%, ${
+                  100 - ((c.t - g.a) / (g.z - g.a)) * 50
+                }%)`
               : 'white'
-          } ${perc}%,${hueA ? `hsl(${hueA}, 100%, 50%)` : 'white'} ${perc}%)`
+          } ${perc}%,${
+            typeof hueA === 'number' ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
+          } ${perc}%)`
         );
         $cell.style.setProperty(
           'color',
-          hueO ? `hsl(${reverseHue(hueO)}, 100%, 50%)` : null
+          typeof hueO === 'number'
+            ? `hsl(${reverseHue(hueO)}deg, 100%, 50%)`
+            : null
         );
         $cell.style.setProperty(
           'box-shadow',
@@ -118,32 +124,31 @@ addEventListener('load', () => {
     const ranking = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
     Array.from($rank.children).forEach(($r, idx) => {
       const r = ranking[idx];
-      if (r) {
-        const hue = getHue(r.u);
-        $r.style.setProperty(
-          'background',
-          hue ? `hsl(${hue}, 100%, 50%)` : null
-        );
-        $r.style.setProperty(
-          'color',
-          hue ? `hsl(${reverseHue(hue)}, 100%, 50%)` : null
-        );
-        $r.style.setProperty('text-decoration', r.a ? 'underline' : null);
-        $r.textContent = `${r.n || r.u.slice(0, 8)} ($${r.s}) [#${r.o}] [*${
-          r.e
-        }]`;
-        $r.onclick = () => {
-          open(`?view=${r.u}`);
-        };
-        $r.style.setProperty('cursor', 'pointer');
-      } else {
-        $r.style.setProperty('background', null);
-        $r.style.setProperty('color', null);
-        $r.style.setProperty('text-decoration', null);
-        $r.textContent = '';
-        $r.onclick = null;
-        $r.style.setProperty('cursor', null);
-      }
+      const hue = getHue(r?.u);
+      $r.style.setProperty(
+        'background',
+        typeof hue === 'number' ? `hsl(${hue}deg, 100%, 50%)` : null
+      );
+      $r.style.setProperty(
+        'color',
+        typeof hue === 'number' ? `hsl(${reverseHue(hue)}deg, 100%, 50%)` : null
+      );
+      $r.style.setProperty('text-decoration', r?.a ? 'underline' : null);
+      $r.style.setProperty(
+        'font-weight',
+        (v && r?.u === v) || (Combat._uuid && r?.u === Combat._uuid)
+          ? 'bold'
+          : null
+      );
+      $r.textContent = r
+        ? `${r.n || r.u.slice(0, 8)} ($${r.s}) [#${r.o}] [*${r.e}]`
+        : '';
+      $r.onclick = r
+        ? () => {
+            open(`?view=${r.u}`);
+          }
+        : null;
+      $r.style.setProperty('cursor', r ? 'pointer' : null);
     });
   };
 
