@@ -242,7 +242,7 @@ addEventListener('load', () => {
       value: await getValue(),
     });
     editor.addAction({
-      id: 'combat-save',
+      id: 'game-save',
       label: 'Save',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
       contextMenuGroupId: '9_cutcopypaste',
@@ -250,7 +250,7 @@ addEventListener('load', () => {
       run: handleSave,
     });
     editor.addAction({
-      id: 'combat-load',
+      id: 'game-load',
       label: 'Load',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO],
       contextMenuGroupId: '9_cutcopypaste',
@@ -258,12 +258,36 @@ addEventListener('load', () => {
       run: handleLoad,
     });
     editor.addAction({
-      id: 'combat-run',
+      id: 'game-down',
+      label: 'Step Down',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 6,
+      run: handleStepDown,
+    });
+    editor.addAction({
+      id: 'game-up',
+      label: 'Step Up',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 7,
+      run: handleStepUp,
+    });
+    editor.addAction({
+      id: 'game-run',
       label: 'Run',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR],
       contextMenuGroupId: '9_cutcopypaste',
-      contextMenuOrder: 6,
+      contextMenuOrder: 8,
       run: handleRun,
+    });
+    editor.addAction({
+      id: 'game-clear',
+      label: 'Clear',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 9,
+      run: handleClear,
     });
   });
   const pool = new Map();
@@ -323,14 +347,21 @@ addEventListener('load', () => {
   const handleRun = () => {
     worker.postMessage({
       c: editor?.getValue(),
-      i: parseInt($int.value) || 1e3,
+      t: parseInt($int.value) || 1e3,
       x: $hasty.checked,
     });
   };
+  const handleStepDown = () => {
+    $int.stepDown();
+  };
+  const handleStepUp = () => {
+    $int.stepUp();
+  };
   $run.onclick = handleRun;
-  $clear.onclick = () => {
+  const handleClear = () => {
     $logger.value = '';
   };
+  $clear.onclick = handleClear;
   const worker = new Worker('worker.js');
   worker.onmessage = async ({ data: { $, n, a } }) => {
     worker.postMessage({ $, d: await Game[n]?.(...a) });

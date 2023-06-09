@@ -33,7 +33,7 @@ const _invoke = (n, a) => {
 
 let _id;
 
-onmessage = ({ data: { $, d, c, i, x } }) => {
+onmessage = ({ data: { $, d, c, t, x } }) => {
   if ($) {
     _pool.get($)?.(d);
     _pool.delete($);
@@ -46,7 +46,7 @@ onmessage = ({ data: { $, d, c, i, x } }) => {
   (async () => {
     while (id === _id) {
       await Promise.all([
-        sleep(i),
+        sleep(t),
         F().catch((err) => {
           console.error(err);
           if (!x) throw err;
