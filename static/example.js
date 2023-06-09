@@ -8,7 +8,7 @@ const CT = Helpers.getCell(g, Math.floor(g.w / 2), Math.floor(g.h / 2));
 /** @param {ICell} c */
 const z = (c) =>
   (c.o === u.u
-    ? (g.v * Helpers.getAdjCells(c, u).length) / 4
+    ? (g.v * Helpers.getAdjCells(g, c, u).length) / 4
     : c.g
     ? g.s
     : c.e
