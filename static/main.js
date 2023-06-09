@@ -1,25 +1,15 @@
 addEventListener('load', () => {
-  /** @type {Combat} */
-  const Combat = {
-    _uuid: '',
-    attack: (x, y) => send({ x, y }),
-    fetchUser: () => send({ u: 1 }),
-    async fetchGame(u) {
-      const v = u === 0 || u === null ? undefined : u || this._uuid;
-      return {
-        g: await (
-          await fetch(
-            v
-              ? `g?${new URLSearchParams({
-                  v,
-                })}`
-              : 'g'
-          )
-        ).json(),
-      };
+  /** @type {Game} */
+  const Game = {
+    async fetchUser() {
+      return this._user ? { u: this._user } : await send({ u: 1 });
     },
-    updateName: (n) => send({ n }),
-    updateHue: (h) => send({ h }),
+    fetchGame: async () => ({
+      g: await (await fetch('g')).json(),
+    }),
+    updateUserName: (n) => send({ n }),
+    updateUserHue: (h) => send({ h }),
+    attack: (x, y) => send({ x, y }),
     log: (...args) => {
       console.log(...args);
       $logger.value += `${args
@@ -40,12 +30,14 @@ addEventListener('load', () => {
     });
   /** @param {number} h */
   const reverseHue = (h) => (h + 180) % 360;
+
   /** @param {IUser} u */
   const refreshUser = (u) => {
+    Game._user = u;
+    $uuid.textContent = u.u;
     $name.value = u.n;
     $color.style.setProperty('--h', `${u.h}deg`);
     $color.style.setProperty('--r', `${reverseHue(u.h)}deg`);
-    $uuid.textContent = u.u;
   };
   /** @param {IGame} g */
   const refreshGame = (g, v) => {
@@ -62,6 +54,7 @@ addEventListener('load', () => {
     };
     if ($board.childElementCount !== g.c.length) {
       $board.textContent = '';
+      $board.style.setProperty('--w', `${g.w}`);
       $board.append(
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
@@ -70,26 +63,28 @@ addEventListener('load', () => {
           else {
             const { x, y } = g.c[idx];
             $cell.onclick = () => {
-              Combat.attack(x, y);
+              Game.attack(x, y);
             };
           }
           return $cell;
         })
       );
-      $board.style.setProperty('--w', `${g.w}`);
     }
     g.c.forEach((c, idx) => {
       const $cell = $board.children.item(idx);
       if ($cell) {
+        const t = Helpers.getCellTime(
+          g,
+          c,
+          v ? g.u.find(({ u }) => u === v) : Game._user
+        );
         const hueO = getHue(c.o);
         const hueA = getHue(c.a);
         const perc = (c.a ? (c.u - g.t) / (c.u - c.b) : 1) * 100;
         $cell.style.setProperty(
           '--co',
           typeof hueO === 'number'
-            ? `hsl(${hueO}deg, 100%, ${
-                100 - ((c.t - g.a) / (g.z - g.a)) * 50
-              }%)`
+            ? `hsl(${hueO}deg, 100%, ${100 - ((t - g.a) / (g.z - g.a)) * 50}%)`
             : 'white'
         );
         $cell.style.setProperty(
@@ -97,40 +92,53 @@ addEventListener('load', () => {
           typeof hueA === 'number' ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
         );
         $cell.style.setProperty('--p', `${perc}%`);
-        $cell.style.setProperty('--h', `${reverseHue(hueO)}deg`);
+        $cell.style.setProperty(
+          '--h',
+          typeof hueO === 'number' ? `${reverseHue(hueO)}deg` : null
+        );
         if (c.g) $cell.classList.add('gold');
         else $cell.classList.remove('gold');
         if (c.e) $cell.classList.add('energy');
         else $cell.classList.remove('energy');
         if (
           (v && (c.o === v || c.a === v)) ||
-          (Combat._uuid && (c.o === Combat._uuid || c.a === Combat._uuid))
+          (Game._user &&
+            (Helpers.isCellOwnedBy(c, Game._user) ||
+              Helpers.isCellAttackedBy(c, Game._user)))
         )
           $cell.classList.add('self');
         else $cell.classList.remove('self');
-        $cell.textContent = (c.t / 1e3).toFixed();
+        $cell.textContent = (t / 1e3).toFixed();
       }
     });
-    const rank = g.u.filter(({ s }) => s).sort((a, b) => b.s - a.s);
+    const rank = g.u
+      .map((u) => {
+        const s = Helpers.getUserScore(g, u);
+        return { ...u, s };
+      })
+      .filter(({ s }) => s)
+      .sort((a, b) => b.s - a.s);
     Array.from($rank.children).forEach(($p, idx) => {
-      const r = rank[idx];
-      const hue = getHue(r?.u);
+      const u = rank[idx];
+      const hue = getHue(u?.u);
       $p.style.setProperty('--h', `${hue}deg`);
       $p.style.setProperty('--r', `${reverseHue(hue)}deg`);
-      if (r?.a) $p.classList.add('attack');
+      if (u && Helpers.isUserAttacking(g, u)) $p.classList.add('attack');
       else $p.classList.remove('attack');
-      if ((v && r?.u === v) || (Combat._uuid && r?.u === Combat._uuid))
+      if ((v && u?.u === v) || (Game._user && u?.u === Game._user.u))
         $p.classList.add('self');
       else $p.classList.remove('self');
-      if (r) $p.classList.add('active');
+      if (u) $p.classList.add('active');
       else $p.classList.remove('active');
-      $p.onclick = r
+      $p.onclick = u
         ? () => {
-            open(`?view=${r.u}`);
+            open(`?view=${u.u}`);
           }
         : null;
-      $p.textContent = r
-        ? `${r.n || r.u.slice(0, 8)} ($${r.s}) [#${r.o}] [*${r.e}]`
+      $p.textContent = u
+        ? `${u.n || u.u.slice(0, 8)} ($${u.s}) [#${
+            Helpers.getUserOwnedCells(g, u).length
+          }] [*${Helpers.getUserEnergy(g, u)}]`
         : '';
     });
   };
@@ -150,7 +158,7 @@ addEventListener('load', () => {
     ...Array.from(Array(9), () => {
       const $p = document.createElement('div');
       $p.className = 'player';
-      $p.title = '$: score; #: occupied; *: energy';
+      $p.title = '$: score; #: owned; *: energy';
       return $p;
     })
   );
@@ -185,7 +193,7 @@ addEventListener('load', () => {
           sleep(100),
           ...($update.checked
             ? [
-                Combat.fetchGame(view)
+                Game.fetchGame(view)
                   .then(({ g }) => {
                     refreshGame(g, view);
                   })
@@ -258,24 +266,6 @@ addEventListener('load', () => {
       run: handleRun,
     });
   });
-  (async () => {
-    for (;;) {
-      await Promise.all([
-        sleep(100),
-        ...($update.checked
-          ? [
-              Combat.fetchGame()
-                .then(({ g }) => {
-                  refreshGame(g);
-                })
-                .catch((err) => {
-                  console.error(err);
-                }),
-            ]
-          : []),
-      ]);
-    }
-  })();
   const pool = new Map();
   const send = (d) => {
     const $ = crypto.randomUUID();
@@ -294,9 +284,7 @@ addEventListener('load', () => {
     }${location.pathname}/../s`
   );
   socket.onopen = async () => {
-    const { u } = await Combat.fetchUser();
-    Combat._uuid = u.u;
-    refreshUser(u);
+    refreshUser((await Game.fetchUser()).u);
   };
   socket.onmessage = ({ data }) => {
     try {
@@ -314,15 +302,15 @@ addEventListener('load', () => {
   socket.onclose = handleError;
   socket.onerror = handleError;
   $set.onclick = async () => {
-    if ($name.value) refreshUser((await Combat.updateName($name.value)).u);
+    if ($name.value) refreshUser((await Game.updateUserName($name.value)).u);
   };
   $color.onclick = async () => {
-    refreshUser((await Combat.updateHue(Math.floor(Math.random() * 360))).u);
+    refreshUser((await Game.updateUserHue(Math.floor(Math.random() * 360))).u);
   };
   $color.oncontextmenu = async (e) => {
     e.preventDefault();
     const h = parseInt(prompt('Hue'));
-    if (Number.isInteger(h)) refreshUser((await Combat.updateHue(h)).u);
+    if (Number.isInteger(h)) refreshUser((await Game.updateUserHue(h)).u);
   };
   const handleSave = () => {
     localStorage.setItem(CODE_KEY, editor?.getValue() || '');
@@ -337,8 +325,6 @@ addEventListener('load', () => {
       c: editor?.getValue(),
       i: parseInt($int.value) || 1e3,
       x: $hasty.checked,
-      s: 'Combat',
-      f: Object.keys(Combat).filter((x) => !x.startsWith('_')),
     });
   };
   $run.onclick = handleRun;
@@ -347,6 +333,24 @@ addEventListener('load', () => {
   };
   const worker = new Worker('worker.js');
   worker.onmessage = async ({ data: { $, n, a } }) => {
-    worker.postMessage({ $, d: await Combat[n]?.(...a) });
+    worker.postMessage({ $, d: await Game[n]?.(...a) });
   };
+  (async () => {
+    for (;;) {
+      await Promise.all([
+        sleep(100),
+        ...($update.checked
+          ? [
+              Game.fetchGame()
+                .then(({ g }) => {
+                  refreshGame(g);
+                })
+                .catch((err) => {
+                  console.error(err);
+                }),
+            ]
+          : []),
+      ]);
+    }
+  })();
 });

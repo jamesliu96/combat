@@ -1,4 +1,15 @@
-importScripts('uuid.js');
+importScripts('common.js');
+
+/** @type {Game} */
+// deno-lint-ignore no-unused-vars
+const Game = new Proxy(
+  {},
+  {
+    get(_, fn) {
+      return (...args) => _invoke(fn, args);
+    },
+  }
+);
 
 const AsyncFunction = async function () {}.constructor;
 
@@ -7,11 +18,11 @@ const sleep = (t = 0) =>
     setTimeout(r, t);
   });
 
-const pool = new Map();
-const invoke = (n, a) => {
+const _pool = new Map();
+const _invoke = (n, a) => {
   const $ = crypto.randomUUID();
   return new Promise((resolve, reject) => {
-    pool.set($, resolve);
+    _pool.set($, resolve);
     try {
       postMessage({ $, n, a });
     } catch (err) {
@@ -20,26 +31,23 @@ const invoke = (n, a) => {
   });
 };
 
-let id;
-onmessage = ({ data: { $, d, c, i, x, s, f } }) => {
+let _id;
+
+onmessage = ({ data: { $, d, c, i, x } }) => {
   if ($) {
-    pool.get($)?.(d);
-    pool.delete($);
+    _pool.get($)?.(d);
+    _pool.delete($);
     return;
   }
-  pool.clear();
-  const cid = crypto.randomUUID();
-  id = cid;
-  const F = new AsyncFunction(s, c);
-  const Combat = f.reduce(
-    (acc, fn) => ({ ...acc, [fn]: (...args) => invoke(fn, args) }),
-    {}
-  );
+  _pool.clear();
+  const id = crypto.randomUUID();
+  _id = id;
+  const F = new AsyncFunction(c);
   (async () => {
-    while (cid === id) {
+    while (id === _id) {
       await Promise.all([
         sleep(i),
-        F(Combat).catch((err) => {
+        F().catch((err) => {
           console.error(err);
           if (!x) throw err;
         }),

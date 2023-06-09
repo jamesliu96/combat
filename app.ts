@@ -23,16 +23,11 @@ const log = (
 const args = parse<{ p: unknown; port: unknown }>(Deno.args);
 const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
 
-const getUser = (v: unknown) =>
-  typeof v === 'string' && v
-    ? Array.from(game.users).find((u) => u.uuid === v)
-    : undefined;
-
 await new Application()
   .use(
     new Router()
       .get('/g', (ctx) => {
-        ctx.body = game.toJSON(getUser(ctx.URL.searchParams.get('v')));
+        ctx.body = game;
       })
       .get('/s', (ctx) => {
         const socket = ctx.upgrade();

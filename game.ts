@@ -68,7 +68,7 @@ export class Game {
     return this.getCell(x, y)?.attack(user) ?? false;
   }
 
-  toJSON(user?: User): IGame {
+  toJSON(): IGame {
     this.#update();
     return {
       w: this.width,
@@ -81,7 +81,8 @@ export class Game {
       i: this.idle,
       a: this.min,
       z: this.max,
-      c: this.cells.map((x) => x.toJSON(user)),
+      m: this.conv,
+      c: this.cells.map((x) => x.toJSON()),
       u: Array.from(this.users).map((x) => x.toJSON()),
       t: this.now,
     };

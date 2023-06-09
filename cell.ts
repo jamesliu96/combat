@@ -33,18 +33,14 @@ export class Cell {
     ].filter((c) => c && user.is(c.#owner)).length;
   }
 
-  #getTakeTime(user?: User) {
-    const base = this.#owner
+  #time(user: User) {
+    return this.#owner
       ? this.game.min +
-        (this.game.max - this.game.min) *
-          2 ** (-(this.game.now - this.#ownedAt) / this.game.conv)
-      : this.game.idle;
-    if (!user) return base;
-    return (
-      base *
-      (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
-      this.game.energyRatio ** user.energy
-    );
+          (this.game.max - this.game.min) *
+            2 ** (-(this.game.now - this.#ownedAt) / this.game.conv)
+      : this.game.idle *
+          (1 - 0.25 * Math.max(0, this.#adj(user) - 1)) *
+          this.game.energyRatio ** user.energy;
   }
 
   update() {
@@ -58,19 +54,19 @@ export class Cell {
   }
 
   attack(user: User) {
-    if (user.attacking.length || this.attacker) return false;
-    if (!user.occupied.length || user.is(this.owner) || this.#adj(user))
+    if (user.attacking || this.attacker) return false;
+    if (!user.based || user.is(this.owner) || this.#adj(user))
       return this.#attack(user);
     return false;
   }
   #attack(user: User) {
     this.#attacker = user;
     this.#attackedAt = this.game.now;
-    this.#takenAt = this.#attackedAt + this.#getTakeTime(user);
+    this.#takenAt = this.#attackedAt + this.#time(user);
     return true;
   }
 
-  toJSON(user?: User): ICell {
+  toJSON(): ICell {
     return {
       x: this.x,
       y: this.y,
@@ -81,7 +77,6 @@ export class Cell {
       c: this.#ownedAt,
       b: this.#attackedAt,
       u: this.#takenAt,
-      t: this.#getTakeTime(user),
     };
   }
 }

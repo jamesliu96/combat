@@ -5,14 +5,6 @@ interface IUser {
   n: string;
   /** Hue */
   h: number;
-  /** Owned count */
-  o: number;
-  /** Attack count */
-  a: number;
-  /** Score */
-  s: number;
-  /** Energy */
-  e: number;
 }
 
 interface ICell {
@@ -28,14 +20,12 @@ interface ICell {
   o: string;
   /** Attacker's UUID */
   a: string;
-  /** Claimed at */
+  /** Owned at */
   c: number;
   /** Attacked at */
   b: number;
-  /** To be claimed at */
+  /** To be owned at */
   u: number;
-  /** Time cost to occupy */
-  t: number;
 }
 
 interface IGame {
@@ -43,9 +33,9 @@ interface IGame {
   w: number;
   /** Height */
   h: number;
-  /** Gold count */
+  /** Total gold count */
   g: number;
-  /** Energy count */
+  /** Total energy count */
   e: number;
   /** Worth */
   v: number;
@@ -59,6 +49,8 @@ interface IGame {
   a: number;
   /** Maximum take time */
   z: number;
+  /** Convergence */
+  m: number;
   /** Cells */
   c: ICell[];
   /** Users */
@@ -67,19 +59,46 @@ interface IGame {
   t: number;
 }
 
-interface Combat {
-  /** Attack a cell */
-  attack: (x: number, y: number) => Promise<{ a: 0 | 1 }>;
+interface Game {
   /** Fetch user */
   fetchUser: () => Promise<{ u: IUser }>;
   /** Fetch game */
-  fetchGame: (u?: string | 0 | null) => Promise<{ g: IGame }>;
+  fetchGame: () => Promise<{ g: IGame }>;
   /** Update user name */
-  updateName: (n: string) => Promise<{ u: IUser }>;
+  updateUserName: (n: string) => Promise<{ u: IUser }>;
   /** Update user hue */
-  updateHue: (h: number) => Promise<{ u: IUser }>;
+  updateUserHue: (h: number) => Promise<{ u: IUser }>;
+  /** Attack a cell */
+  attack: (x: number, y: number) => Promise<{ a: 0 | 1 }>;
   /** Output log */
   log: (...args: unknown[]) => Promise<void>;
 }
 
-declare const Combat: Combat;
+declare const Game: Game;
+
+interface Helpers {
+  /** Get cell */
+  getCell: (g: IGame, x: number, y: number) => ICell | undefined;
+  /** Whether the cell is owned by user */
+  isCellOwnedBy: (c: ICell, u: IUser) => boolean;
+  /** Whether the cell is being attacked by user */
+  isCellAttackedBy: (c: ICell, u: IUser) => boolean;
+  /** Get adjacent cells (by user) */
+  getAdjCells: (g: IGame, c: ICell, u?: IUser) => ICell[];
+  /** Get owned cells */
+  getUserOwnedCells: (g: IGame, u: IUser) => ICell[];
+  /** Whether user has base */
+  hasUserBase: (g: IGame, u: IUser) => boolean;
+  /** Whether user is attacking */
+  isUserAttacking: (g: IGame, u: IUser) => boolean;
+  /** Get cell time cost (by user) */
+  getCellTime: (g: IGame, c: ICell, u?: IUser) => number;
+  /** Get user energy */
+  getUserEnergy: (g: IGame, u: IUser) => number;
+  /** Get user score */
+  getUserScore: (g: IGame, u: IUser) => number;
+  /** Calculate distance between two cells */
+  calcDist: (a: ICell, b: ICell) => number;
+}
+
+declare const Helpers: Helpers;

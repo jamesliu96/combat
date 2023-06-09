@@ -11,20 +11,17 @@ export class User {
     this.uuid = crypto.randomUUID();
   }
 
-  get occupied() {
-    return this.game.cells.filter((c) => this.is(c.owner));
+  get based() {
+    return this.game.cells.some((c) => this.is(c.owner));
   }
   get attacking() {
-    return this.game.cells.filter((c) => this.is(c.attacker));
-  }
-  get score() {
-    return this.occupied.reduce(
-      (acc, c) => acc + (c.gold ? this.game.goldWorth : this.game.worth),
-      0
-    );
+    return this.game.cells.some((c) => this.is(c.attacker));
   }
   get energy() {
-    return this.occupied.reduce((acc, c) => acc + Number(c.energy), 0);
+    return this.game.cells.reduce(
+      (acc, c) => acc + Number(this.is(c.owner) && c.energy),
+      0
+    );
   }
 
   is(x?: User) {
@@ -36,10 +33,6 @@ export class User {
       u: this.uuid,
       n: this.name,
       h: this.hue,
-      o: this.occupied.length,
-      a: this.attacking.length,
-      s: this.score,
-      e: this.energy,
     };
   }
 }
