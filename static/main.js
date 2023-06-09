@@ -9,7 +9,7 @@ addEventListener('load', () => {
     }),
     updateUserName: (n) => send({ n }),
     updateUserHue: (h) => send({ h }),
-    attack: (x, y) => send({ x, y }),
+    attack: (x, y, z) => send(z ? { x, y, z } : { x, y }),
     log: (...args) => {
       console.log(...args);
       $logger.value += `${args
@@ -63,6 +63,18 @@ addEventListener('load', () => {
           $cell.onclick = () => {
             Game.attack(x, y);
           };
+          $cell.oncontextmenu = (e) => {
+            e.preventDefault();
+            Game.attack(
+              x,
+              y,
+              e.metaKey || e.ctrlKey
+                ? Helpers.Blast.Horizontal
+                : e.shiftKey
+                ? Helpers.Blast.Vertical
+                : Helpers.Blast.Square
+            );
+          };
           return $cell;
         })
       );
@@ -77,7 +89,7 @@ addEventListener('load', () => {
         );
         const hueO = getHue(c.o);
         const hueA = getHue(c.a);
-        const perc = (c.a ? (c.u - g.t) / (c.u - c.b) : 1) * 100;
+        const perc = (c.a ? (c.f - g.t) / (c.f - c.d) : 1) * 100;
         $cell.style.setProperty(
           '--co',
           typeof hueO === 'number'
@@ -97,6 +109,8 @@ addEventListener('load', () => {
         else $cell.classList.remove('gold');
         if (c.e) $cell.classList.add('energy');
         else $cell.classList.remove('energy');
+        if (c.b) $cell.classList.add('blast');
+        else $cell.classList.remove('blast');
         if (
           (v && (c.o === v || c.a === v)) ||
           (Game._user &&

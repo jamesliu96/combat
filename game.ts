@@ -1,4 +1,4 @@
-import { Cell } from './cell.ts';
+import { Cell, Blast } from './cell.ts';
 import { User } from './user.ts';
 
 export class Game {
@@ -13,6 +13,7 @@ export class Game {
     readonly height: number,
     readonly goldCount = 0,
     readonly energyCount = 0,
+    readonly blastCount = 0,
     readonly worth = 1,
     readonly goldWorth = 10,
     readonly energyRatio = 0.95,
@@ -37,6 +38,15 @@ export class Game {
       const idx = Math.floor(Math.random() * N);
       if (!golds.has(idx)) energies.add(idx);
     }
+    this.blastCount = Math.max(
+      0,
+      Math.min(N - this.goldCount - this.energyCount, this.blastCount)
+    );
+    const blasts = new Set<number>();
+    while (blasts.size < this.blastCount) {
+      const idx = Math.floor(Math.random() * N);
+      if (!golds.has(idx) && !energies.has(idx)) blasts.add(idx);
+    }
     this.worth = Math.max(1, this.worth);
     this.goldWorth = Math.max(1, this.goldWorth);
     this.energyRatio = Math.max(0, Math.min(1, this.energyRatio));
@@ -45,7 +55,14 @@ export class Game {
     this.max = Math.max(this.min, this.max);
     this.cells = Array.from(Array(N), (_, idx) => {
       const { x, y } = this.#getCoords(idx);
-      return new Cell(this, x, y, golds.has(idx), energies.has(idx));
+      return new Cell(
+        this,
+        x,
+        y,
+        golds.has(idx),
+        energies.has(idx),
+        blasts.has(idx)
+      );
     });
   }
   #getCoords = (idx: number) => ({
@@ -53,7 +70,7 @@ export class Game {
     y: Math.floor(idx / this.width),
   });
 
-  getCell(x: number, y: number) {
+  cell(x: number, y: number) {
     if (x < 0 || x > this.width - 1 || y < 0 || y > this.height - 1) return;
     return this.cells[x + y * this.width];
   }
@@ -63,9 +80,9 @@ export class Game {
     for (const cell of this.cells) cell.update();
   }
 
-  attack(x: number, y: number, user: User) {
+  attack(x: number, y: number, user: User, blast?: Blast) {
     this.#update();
-    return this.getCell(x, y)?.attack(user) ?? false;
+    this.cell(x, y)?.attack(user, blast);
   }
 
   toJSON(): IGame {

@@ -20,13 +20,10 @@ const z = (c) =>
  */
 const COMP = (a, b) =>
   z(b) - z(a) || (CT ? Helpers.calcDist(CT, a) - Helpers.calcDist(CT, b) : 0);
-/**
- * @param {number} x
- * @param {number} y
- */
-const attack = async (x, y) => {
-  const { a } = await Game.attack(x, y);
-  await Game.log({ x, y }, Boolean(a));
+/** @type {typeof Game.attack} */
+const attack = async (x, y, z) => {
+  await Game.attack(x, y, z);
+  await Game.log({ x, y, z });
 };
 
 if (Helpers.hasUserBase(g, u)) {

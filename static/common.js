@@ -10,6 +10,7 @@ if (!('randomUUID' in crypto))
 /** @type {Helpers} */
 // deno-lint-ignore no-unused-vars
 const Helpers = {
+  Blast: { Square: 1, Horizontal: 2, Vertical: 3 },
   getCell: (g, x, y) => {
     if (x < 0 || x > g.w - 1 || y < 0 || y > g.h - 1) return;
     return g.c[x + y * g.w];
@@ -19,9 +20,9 @@ const Helpers = {
   getAdjCells(g, c, u) {
     const { x, y } = c;
     return [
-      this.getCell(g, x, y + 1),
-      this.getCell(g, x + 1, y),
       this.getCell(g, x, y - 1),
+      this.getCell(g, x + 1, y),
+      this.getCell(g, x, y + 1),
       this.getCell(g, x - 1, y),
     ].filter((c) => c && (!u || this.isCellOwnedBy(c, u)));
   },
@@ -35,7 +36,7 @@ const Helpers = {
     return g.c.some((c) => this.isCellAttackedBy(c, u));
   },
   getCellTime(g, c, u) {
-    const t = c.o ? g.a + (g.z - g.a) * 2 ** (-(g.t - c.c) / g.m) : g.i;
+    const t = c.o ? g.a + (g.z - g.a) * 2 ** (-(g.t - c.s) / g.m) : g.i;
     if (!u) return t;
     return (
       t *
@@ -45,7 +46,7 @@ const Helpers = {
   },
   getUserEnergy(g, u) {
     return g.c.reduce(
-      (acc, c) => acc + Number(this.isCellOwnedBy(c, u) && c.e),
+      (acc, c) => acc + Number(this.isCellOwnedBy(c, u) && Boolean(c.e)),
       0
     );
   },

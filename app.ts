@@ -4,7 +4,7 @@ import { serveDir } from 'https://deno.land/std@0.190.0/http/file_server.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
-const game = new Game(30, 30, 10, 10);
+const game = new Game(30, 30, 10, 10, 5);
 
 const log = (
   type: string,
@@ -40,7 +40,7 @@ await new Application()
           } catch {
             data = {};
           }
-          const { $, u, n, h, x, y } = data;
+          const { $, u, n, h, x, y, z } = data;
           const _: Record<string, unknown> = { $ };
           if (u) _.u = user;
           if (typeof n === 'string') {
@@ -56,9 +56,8 @@ await new Application()
             _.u = user;
           }
           if (typeof x === 'number' && typeof y === 'number') {
-            const a = game.attack(x, y, user);
-            _.a = Number(a);
-            log('attack', user, { x, y }, a);
+            log('attack', user, { x, y, z });
+            game.attack(x, y, user, z);
           }
           try {
             socket.send(JSON.stringify(_));

@@ -16,16 +16,18 @@ interface ICell {
   g: 0 | 1;
   /** Energy binary */
   e: 0 | 1;
+  /** Blast binary */
+  b: 0 | 1;
   /** Owner's UUID */
   o: string;
   /** Attacker's UUID */
   a: string;
   /** Owned at */
-  c: number;
+  s: number;
   /** Attacked at */
-  b: number;
+  d: number;
   /** To be owned at */
-  u: number;
+  f: number;
 }
 
 interface IGame {
@@ -69,7 +71,7 @@ interface Game {
   /** Update user hue */
   updateUserHue: (h: number) => Promise<{ u: IUser }>;
   /** Attack a cell */
-  attack: (x: number, y: number) => Promise<{ a: 0 | 1 }>;
+  attack: (x: number, y: number, z?: typeof Helpers.Blast) => Promise<void>;
   /** Output log */
   log: (...args: unknown[]) => Promise<void>;
 }
@@ -77,6 +79,12 @@ interface Game {
 declare const Game: Game;
 
 interface Helpers {
+  /** Blast */
+  readonly Blast: {
+    readonly Square: 1;
+    readonly Horizontal: 2;
+    readonly Vertical: 3;
+  };
   /** Get cell */
   getCell: (g: IGame, x: number, y: number) => ICell | undefined;
   /** Whether the cell is owned by user */
