@@ -59,13 +59,10 @@ addEventListener('load', () => {
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
           $cell.className = 'cell';
-          if (typeof v !== 'undefined') $cell.classList.add('stale');
-          else {
-            const { x, y } = g.c[idx];
-            $cell.onclick = () => {
-              Game.attack(x, y);
-            };
-          }
+          const { x, y } = g.c[idx];
+          $cell.onclick = () => {
+            Game.attack(x, y);
+          };
           return $cell;
         })
       );
@@ -152,6 +149,7 @@ addEventListener('load', () => {
     if ((e.key === '.' || e.code === 'Period') && (e.ctrlKey || e.metaKey))
       $update.click();
   });
+  const $game = document.querySelector('.game');
   const $rank = document.querySelector('.rank');
   $rank.style.setProperty('--w', '3');
   $rank.append(
@@ -179,23 +177,19 @@ addEventListener('load', () => {
   const $logger = document.querySelector('#logger');
   const $clear = document.querySelector('#clear');
 
-  const view = new URLSearchParams(location.search).get('view');
-  if (view !== null) {
-    document
-      .querySelectorAll('.logic')
-      .forEach(($e) => $e.style.setProperty('display', 'none'));
-    $uuid.textContent = view;
-    $editor.style.setProperty('display', 'none');
-    $logger.style.setProperty('display', 'none');
+  const VIEW = new URLSearchParams(location.search).get('view');
+  if (VIEW !== null) {
+    $game.classList.add('view');
+    $uuid.textContent = VIEW;
     (async () => {
       for (;;) {
         await Promise.all([
           sleep(100),
           ...($update.checked
             ? [
-                Game.fetchGame(view)
+                Game.fetchGame()
                   .then(({ g }) => {
-                    refreshGame(g, view);
+                    refreshGame(g, VIEW);
                   })
                   .catch((err) => {
                     console.error(err);

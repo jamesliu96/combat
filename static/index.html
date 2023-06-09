@@ -30,6 +30,14 @@
         align-items: center;
         gap: 10px;
       }
+      .game.view .logic,
+      .game.view #editor,
+      .game.view #logger {
+        display: none;
+      }
+      .game.view .cell {
+        pointer-events: none;
+      }
       .rank {
         display: grid;
         grid-template-rows: repeat(var(--w), auto);
@@ -56,7 +64,7 @@
         color: lightslategray;
       }
       .player.attack {
-        box-shadow: hsl(var(--r), 100%, 50%) 0 0 5px 2px;
+        box-shadow: hsl(var(--r), 100%, 50%) 0 0 10px 4px;
       }
       .player.self {
         font-weight: bold;
@@ -97,9 +105,6 @@
         line-height: 1;
         border-radius: 4px;
         cursor: pointer;
-      }
-      .cell.stale {
-        pointer-events: none;
       }
       .cell.gold {
         box-shadow: gold 0 0 5px 0 inset, gold 0 0 5px 1px;
