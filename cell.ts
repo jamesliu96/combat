@@ -1,7 +1,7 @@
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
-export enum Blast {
+export const enum Blast {
   Square = 1,
   Horizontal = 2,
   Vertical = 3,

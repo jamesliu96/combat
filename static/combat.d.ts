@@ -61,30 +61,15 @@ interface IGame {
   t: number;
 }
 
-interface Game {
-  /** Fetch user */
-  fetchUser: () => Promise<{ u: IUser }>;
-  /** Fetch game */
-  fetchGame: () => Promise<{ g: IGame }>;
-  /** Update user name */
-  updateUserName: (n: string) => Promise<{ u: IUser }>;
-  /** Update user hue */
-  updateUserHue: (h: number) => Promise<{ u: IUser }>;
-  /** Attack a cell */
-  attack: (x: number, y: number, z?: typeof Helpers.Blast) => Promise<void>;
-  /** Output log */
-  log: (...args: unknown[]) => Promise<void>;
-}
-
-declare const Game: Game;
+type Blast = Readonly<{
+  Square: 1;
+  Horizontal: 2;
+  Vertical: 3;
+}>;
 
 interface Helpers {
   /** Blast */
-  readonly Blast: {
-    readonly Square: 1;
-    readonly Horizontal: 2;
-    readonly Vertical: 3;
-  };
+  readonly Blast: Blast;
   /** Get cell */
   getCell: (g: IGame, x: number, y: number) => ICell | undefined;
   /** Whether the cell is owned by user */
@@ -110,3 +95,20 @@ interface Helpers {
 }
 
 declare const Helpers: Helpers;
+
+interface Game {
+  /** Fetch user */
+  fetchUser: () => Promise<{ u: IUser }>;
+  /** Fetch game */
+  fetchGame: () => Promise<{ g: IGame }>;
+  /** Update user name */
+  updateUserName: (n: string) => Promise<{ u: IUser }>;
+  /** Update user hue */
+  updateUserHue: (h: number) => Promise<{ u: IUser }>;
+  /** Attack a cell */
+  attack: (x: number, y: number, z?: Blast[keyof Blast]) => Promise<void>;
+  /** Output log */
+  log: (...args: unknown[]) => Promise<void>;
+}
+
+declare const Game: Game;
