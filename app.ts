@@ -41,26 +41,26 @@ await new Application()
             data = {};
           }
           const { $, u, n, h, x, y, z } = data;
-          const _: Record<string, unknown> = { $ };
-          if (u) _.u = user;
+          const d: Record<string, unknown> = { $ };
+          if (u) d.u = user;
           if (typeof n === 'string') {
             const name = n.slice(0, 8);
             log('name', user, `'${user.name}'`, '->', `'${name}'`);
             user.name = name;
-            _.u = user;
+            d.u = user;
           }
           if (typeof h === 'number') {
             const hue = Math.floor(h % 360);
             log('hue', user, user.hue, '->', hue);
             user.hue = hue;
-            _.u = user;
+            d.u = user;
           }
           if (typeof x === 'number' && typeof y === 'number') {
             log('attack', user, { x, y, z });
             game.attack(x, y, user, z);
           }
           try {
-            socket.send(JSON.stringify(_));
+            socket.send(JSON.stringify(d));
           } catch (err) {
             log('ERR', undefined, err);
           }
