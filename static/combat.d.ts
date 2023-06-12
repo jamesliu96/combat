@@ -61,15 +61,15 @@ interface IGame {
   t: number;
 }
 
-type Blast = Readonly<{
+interface Blast {
   Square: 1;
   Horizontal: 2;
   Vertical: 3;
-}>;
+}
 
 interface Helpers {
   /** Blast */
-  readonly Blast: Blast;
+  Blast: Blast;
   /** Get cell */
   getCell: (g: IGame, x: number, y: number) => ICell | undefined;
   /** Whether the cell is owned by user */
