@@ -89,22 +89,21 @@ addEventListener('load', () => {
         );
         const hueO = getHue(c.o);
         const hueA = getHue(c.a);
+        const hueON = typeof hueO === 'number';
+        const hueAN = typeof hueA === 'number';
         const perc = (c.a ? (c.f - g.t) / (c.f - c.d) : 1) * 100;
         $cell.style.setProperty(
-          '--co',
-          typeof hueO === 'number'
+          '--o',
+          hueON
             ? `hsl(${hueO}deg, 100%, ${100 - ((t - g.a) / (g.z - g.a)) * 50}%)`
             : 'white'
         );
         $cell.style.setProperty(
-          '--ca',
-          typeof hueA === 'number' ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
+          '--a',
+          hueAN ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
         );
         $cell.style.setProperty('--p', `${perc}%`);
-        $cell.style.setProperty(
-          '--h',
-          typeof hueO === 'number' ? `${reverseHue(hueO)}deg` : null
-        );
+        $cell.style.setProperty('--h', hueON ? `${reverseHue(hueO)}deg` : null);
         if (c.g) $cell.classList.add('gold');
         else $cell.classList.remove('gold');
         if (c.e) $cell.classList.add('energy');
@@ -377,7 +376,7 @@ addEventListener('load', () => {
   (async () => {
     for (;;) {
       await Promise.all([
-        sleep(100),
+        // sleep(100),
         ...($update.checked
           ? [
               Game.fetchGame()
