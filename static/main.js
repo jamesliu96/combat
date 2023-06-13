@@ -24,10 +24,7 @@ addEventListener('load', () => {
     },
   };
 
-  const sleep = (t = 0) =>
-    new Promise((r) => {
-      setTimeout(r, t);
-    });
+  const animationFrame = () => new Promise(requestAnimationFrame);
   /** @param {number} h */
   const reverseHue = (h) => (h + 180) % 360;
 
@@ -197,7 +194,7 @@ addEventListener('load', () => {
     (async () => {
       for (;;) {
         await Promise.all([
-          sleep(100),
+          animationFrame(),
           ...($update.checked
             ? [
                 Game.fetchGame()
@@ -376,7 +373,7 @@ addEventListener('load', () => {
   (async () => {
     for (;;) {
       await Promise.all([
-        sleep(100),
+        animationFrame(),
         ...($update.checked
           ? [
               Game.fetchGame()
