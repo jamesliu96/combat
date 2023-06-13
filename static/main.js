@@ -376,7 +376,7 @@ addEventListener('load', () => {
   (async () => {
     for (;;) {
       await Promise.all([
-        // sleep(100),
+        sleep(100),
         ...($update.checked
           ? [
               Game.fetchGame()
