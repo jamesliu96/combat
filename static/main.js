@@ -26,7 +26,7 @@ addEventListener('load', () => {
 
   const frame = () => new Promise(requestAnimationFrame);
   /** @param {number} h */
-  const reverseHue = (h) => (h + 180) % 360;
+  const invertHue = (h) => (h + 180) % 360;
 
   /** @param {IUser} u */
   const refreshUser = (u) => {
@@ -34,7 +34,7 @@ addEventListener('load', () => {
     $uuid.textContent = u.u;
     $name.value = u.n;
     $color.style.setProperty('--h', `${u.h}deg`);
-    $color.style.setProperty('--r', `${reverseHue(u.h)}deg`);
+    $color.style.setProperty('--r', `${invertHue(u.h)}deg`);
   };
   /** @param {IGame} g */
   const refreshGame = (g, v) => {
@@ -42,9 +42,9 @@ addEventListener('load', () => {
     const hues = {};
     const getHue = (id) => {
       if (!id) return;
-      if (typeof hues[id] === 'number') return hues[id];
+      if (typeof hues[id] !== 'undefined') return hues[id];
       const hue = g.u.find(({ u }) => u === id)?.h;
-      if (typeof hue === 'number') {
+      if (typeof hue !== 'undefined') {
         hues[id] = hue;
         return hue;
       }
@@ -86,21 +86,21 @@ addEventListener('load', () => {
         );
         const hueO = getHue(c.o);
         const hueA = getHue(c.a);
-        const hueON = typeof hueO === 'number';
-        const hueAN = typeof hueA === 'number';
+        const hueOV = typeof hueO !== 'undefined';
+        const hueAV = typeof hueA !== 'undefined';
         const perc = (c.a ? (c.f - g.t) / (c.f - c.d) : 1) * 100;
         $cell.style.setProperty(
           '--o',
-          hueON
+          hueOV
             ? `hsl(${hueO}deg, 100%, ${100 - ((t - g.a) / (g.z - g.a)) * 50}%)`
             : 'white'
         );
         $cell.style.setProperty(
           '--a',
-          hueAN ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
+          hueAV ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
         );
         $cell.style.setProperty('--p', `${perc}%`);
-        $cell.style.setProperty('--h', hueON ? `${reverseHue(hueO)}deg` : null);
+        $cell.style.setProperty('--h', hueOV ? `${invertHue(hueO)}deg` : null);
         if (c.g) $cell.classList.add('gold');
         else $cell.classList.remove('gold');
         if (c.e) $cell.classList.add('energy');
@@ -128,8 +128,9 @@ addEventListener('load', () => {
     Array.from($rank.children).forEach(($p, idx) => {
       const u = rank[idx];
       const hue = getHue(u?.u);
-      $p.style.setProperty('--h', `${hue}deg`);
-      $p.style.setProperty('--r', `${reverseHue(hue)}deg`);
+      const hueV = typeof hue !== 'undefined';
+      $p.style.setProperty('--h', hueV ? `${hue}deg` : null);
+      $p.style.setProperty('--r', hueV ? `${invertHue(hue)}deg` : null);
       if (u && Helpers.isUserAttacking(g, u)) $p.classList.add('attack');
       else $p.classList.remove('attack');
       if ((v && u?.u === v) || (Game._user && u?.u === Game._user.u))
