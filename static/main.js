@@ -88,7 +88,6 @@ addEventListener('load', () => {
         const hueA = getHue(c.a);
         const hueOV = typeof hueO !== 'undefined';
         const hueAV = typeof hueA !== 'undefined';
-        const perc = (c.a ? (c.f - g.t) / (c.f - c.d) : 1) * 100;
         $cell.style.setProperty(
           '--o',
           hueOV
@@ -99,7 +98,10 @@ addEventListener('load', () => {
           '--a',
           hueAV ? `hsl(${hueA}deg, 100%, 50%)` : 'white'
         );
-        $cell.style.setProperty('--p', `${perc}%`);
+        $cell.style.setProperty(
+          '--p',
+          `${(c.a ? (c.f - g.t) / (c.f - c.d) : 1) * 100}%`
+        );
         $cell.style.setProperty('--h', hueOV ? `${invertHue(hueO)}deg` : null);
         if (c.g) $cell.classList.add('gold');
         else $cell.classList.remove('gold');
