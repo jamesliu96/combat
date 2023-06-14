@@ -24,7 +24,7 @@ addEventListener('load', () => {
     },
   };
 
-  const animationFrame = () => new Promise(requestAnimationFrame);
+  const frame = () => new Promise(requestAnimationFrame);
   /** @param {number} h */
   const reverseHue = (h) => (h + 180) % 360;
 
@@ -187,19 +187,26 @@ addEventListener('load', () => {
   const $logger = document.querySelector('#logger');
   const $clear = document.querySelector('#clear');
 
-  const VIEW = new URLSearchParams(location.search).get('view');
-  if (VIEW !== null) {
+  const search = new URLSearchParams(location.search);
+
+  if (search.has('lazy')) {
+    $update.checked = false;
+    $update.indeterminate = true;
+  }
+
+  if (search.has('view')) {
+    const view = search.get('view');
+    $uuid.textContent = view;
     $game.classList.add('view');
-    $uuid.textContent = VIEW;
     (async () => {
       for (;;) {
         await Promise.all([
-          animationFrame(),
+          frame(),
           ...($update.checked
             ? [
                 Game.fetchGame()
                   .then(({ g }) => {
-                    refreshGame(g, VIEW);
+                    refreshGame(g, view);
                   })
                   .catch((err) => {
                     console.error(err);
@@ -373,7 +380,7 @@ addEventListener('load', () => {
   (async () => {
     for (;;) {
       await Promise.all([
-        animationFrame(),
+        frame(),
         ...($update.checked
           ? [
               Game.fetchGame()
