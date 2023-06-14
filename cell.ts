@@ -126,9 +126,9 @@ export class Cell {
     return {
       x: this.x,
       y: this.y,
-      g: Number(this.gold) as 0 | 1,
-      e: Number(this.energy) as 0 | 1,
-      b: Number(this.blast) as 0 | 1,
+      g: Number(this.gold) as binary,
+      e: Number(this.energy) as binary,
+      b: Number(this.blast) as binary,
       o: this.#owner?.uuid ?? '',
       a: this.#attacker?.uuid ?? '',
       s: this.#ownedAt,

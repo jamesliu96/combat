@@ -1,3 +1,5 @@
+type binary = 0 | 1;
+
 interface IUser {
   /** UUID */
   u: string;
@@ -13,11 +15,11 @@ interface ICell {
   /** y-coordinate */
   y: number;
   /** Gold binary */
-  g: 0 | 1;
+  g: binary;
   /** Energy binary */
-  e: 0 | 1;
+  e: binary;
   /** Blast binary */
-  b: 0 | 1;
+  b: binary;
   /** Owner's UUID */
   o: string;
   /** Attacker's UUID */
