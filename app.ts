@@ -4,7 +4,7 @@ import { serveDir } from 'https://deno.land/std@0.190.0/http/file_server.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
-const game = new Game(30, 30, 10, 10, 5);
+const game = new Game(30, 30, 10, 10, 10);
 
 const log = (
   type: string,
