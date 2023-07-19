@@ -1,6 +1,6 @@
-import { Application, Router } from 'https://deno.land/x/railgun@v0.4.1/mod.ts';
-import { parse } from 'https://deno.land/std@0.193.0/flags/mod.ts';
-import { serveDir } from 'https://deno.land/std@0.193.0/http/file_server.ts';
+import { Application, Router } from 'https://deno.land/x/railgun@v0.4.2/mod.ts';
+import { parse } from 'https://deno.land/std@0.194.0/flags/mod.ts';
+import { serveDir } from 'https://deno.land/std@0.194.0/http/file_server.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
