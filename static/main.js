@@ -233,7 +233,7 @@ addEventListener('load', () => {
     localStorage.getItem(CODE_KEY) || (await getRemoteValue());
   require.config({
     paths: {
-      vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs',
+      vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs',
     },
   });
   require(['vs/editor/editor.main'], async () => {

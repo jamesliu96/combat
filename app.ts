@@ -1,6 +1,6 @@
-import { Application, Router } from 'https://deno.land/x/railgun@v0.4.3/mod.ts';
-import { parse } from 'https://deno.land/std@0.195.0/flags/mod.ts';
-import { serveDir } from 'https://deno.land/std@0.195.0/http/file_server.ts';
+import { Application, Router } from 'https://deno.land/x/railgun@v0.4.4/mod.ts';
+import { serveDir } from 'https://deno.land/std@0.208.0/http/file_server.ts';
+import { parseArgs } from 'https://deno.land/std@0.208.0/cli/parse_args.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
@@ -20,7 +20,7 @@ const log = (
   );
 };
 
-const args = parse<{ p: unknown; port: unknown }>(Deno.args);
+const args = parseArgs<{ p: unknown; port: unknown }>(Deno.args);
 const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
 
 await new Application()
