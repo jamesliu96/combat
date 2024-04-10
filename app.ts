@@ -40,8 +40,9 @@ await new Application()
           } catch {
             data = {};
           }
-          const { $, u, n, h, x, y, z } = data;
+          const { $, g, u, n, h, x, y, z } = data;
           const d: Record<string, unknown> = { $ };
+          if (g) d.g = game;
           if (u) d.u = user;
           if (typeof n === 'string') {
             const name = n.slice(0, 8);

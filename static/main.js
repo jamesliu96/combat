@@ -4,9 +4,8 @@ addEventListener('load', () => {
     async fetchUser() {
       return this._user ? { u: this._user } : await send({ u: 1 });
     },
-    fetchGame: async () => ({
-      g: await (await fetch('g')).json(),
-    }),
+    fetchGame: async (_) =>
+      _ ? { g: await (await fetch('g')).json() } : send({ g: 1 }),
     updateUserName: (n) => send({ n }),
     updateUserHue: (h) => send({ h }),
     attack: (x, y, z) => send(z ? { x, y, z } : { x, y }),
@@ -207,7 +206,7 @@ addEventListener('load', () => {
           frame(),
           ...($update.checked
             ? [
-                Game.fetchGame()
+                Game.fetchGame(1)
                   .then(({ g }) => {
                     refreshGame(g, view);
                   })
