@@ -33,7 +33,7 @@ await new Application()
         const socket = ctx.upgrade();
         const user = new User(game);
         game.users.add(user);
-        log('welcome', user);
+        log('hey', user);
         socket.onmessage = ({ data }) => {
           try {
             data = JSON.parse(data) ?? {};
