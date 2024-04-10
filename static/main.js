@@ -35,8 +35,11 @@ addEventListener('load', () => {
     $color.style.setProperty('--h', `${u.h}deg`);
     $color.style.setProperty('--r', `${invertHue(u.h)}deg`);
   };
-  /** @param {IGame} g */
-  const refreshGame = (g, v) => {
+  /**
+   * @param {IGame} g
+   * @param {string|null} v
+   */
+  const refreshGame = (g, v = '') => {
     $ping.textContent = (Date.now() - g.t).toFixed();
     const hues = {};
     const getHue = (id) => {
@@ -360,7 +363,7 @@ addEventListener('load', () => {
   const handleRun = () => {
     worker.postMessage({
       c: editor?.getValue(),
-      t: parseInt($int.value) || 1e3,
+      t: parseInt($int.value),
       x: $hasty.checked,
     });
   };

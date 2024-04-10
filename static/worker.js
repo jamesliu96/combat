@@ -46,7 +46,7 @@ onmessage = ({ data: { $, d, c, t, x } }) => {
   (async () => {
     while (id === _id) {
       await Promise.all([
-        sleep(t),
+        ...(t > 0 ? [sleep(t)] : []),
         F().catch((err) => {
           console.error(err);
           if (!x) throw err;
