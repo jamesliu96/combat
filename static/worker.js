@@ -33,7 +33,7 @@ const _invoke = (n, a) => {
 
 let _id;
 
-onmessage = ({ data: { $, d, c, t, x } }) => {
+onmessage = ({ data: { $, d, c, t, x, s } }) => {
   if ($) {
     _pool.get($)?.(d);
     _pool.delete($);
@@ -42,6 +42,7 @@ onmessage = ({ data: { $, d, c, t, x } }) => {
   _pool.clear();
   const id = crypto.randomUUID();
   _id = id;
+  if (s) return;
   const F = new AsyncFunction(c);
   (async () => {
     while (id === _id) {

@@ -1,6 +1,6 @@
-import { Application, Router } from 'https://deno.land/x/railgun@v0.5.3/mod.ts';
-import { serveDir } from 'https://deno.land/std@0.221.0/http/file_server.ts';
-import { parseArgs } from 'https://deno.land/std@0.221.0/cli/parse_args.ts';
+import { Application, Router } from 'https://deno.land/x/railgun@v0.5.4/mod.ts';
+import { serveDir } from 'https://deno.land/std@0.223.0/http/file_server.ts';
+import { parseArgs } from 'https://deno.land/std@0.223.0/cli/parse_args.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
@@ -45,7 +45,7 @@ await new Application()
           if (g) d.g = game;
           if (u) d.u = user;
           if (typeof n === 'string') {
-            const name = n.slice(0, 8);
+            const name = n.slice(0, 16);
             log('name', user, `'${user.name}'`, '->', `'${name}'`);
             user.name = name;
             d.u = user;

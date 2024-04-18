@@ -189,6 +189,7 @@ addEventListener('load', () => {
   const $int = document.querySelector('#int');
   const $hasty = document.querySelector('#hasty');
   const $run = document.querySelector('#run');
+  const $kill = document.querySelector('#kill');
   const $logger = document.querySelector('#logger');
   const $clear = document.querySelector('#clear');
 
@@ -298,11 +299,19 @@ addEventListener('load', () => {
       run: handleRun,
     });
     editor.addAction({
+      id: 'game-kill',
+      label: 'Kill',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB],
+      contextMenuGroupId: '9_cutcopypaste',
+      contextMenuOrder: 9,
+      run: handleKill,
+    });
+    editor.addAction({
       id: 'game-clear',
       label: 'Clear',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
       contextMenuGroupId: '9_cutcopypaste',
-      contextMenuOrder: 9,
+      contextMenuOrder: 10,
       run: handleClear,
     });
   });
@@ -367,6 +376,9 @@ addEventListener('load', () => {
       x: $hasty.checked,
     });
   };
+  const handleKill = () => {
+    worker.postMessage({ s: 1 });
+  };
   const handleStepDown = () => {
     $int.stepDown();
   };
@@ -374,6 +386,7 @@ addEventListener('load', () => {
     $int.stepUp();
   };
   $run.onclick = handleRun;
+  $kill.onclick = handleKill;
   const handleClear = () => {
     $logger.value = '';
   };
