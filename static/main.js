@@ -4,8 +4,8 @@ addEventListener('load', () => {
     async fetchUser() {
       return this._user ? { u: this._user } : await send({ u: 1 });
     },
-    fetchGame: async (_) =>
-      _ ? { g: await (await fetch('g')).json() } : send({ g: 1 }),
+    fetchGame: async () =>
+      ok ? send({ g: 1 }) : { g: await (await fetch('g')).json() },
     updateUserName: (n) => send({ n }),
     updateUserHue: (h) => send({ h }),
     attack: (x, y, z) => send(z ? { x, y, z } : { x, y }),
@@ -22,6 +22,8 @@ addEventListener('load', () => {
         .join(' ')}\n`;
     },
   };
+
+  let ok = false;
 
   const frame = () => new Promise(requestAnimationFrame);
   /** @param {number} h */
@@ -210,7 +212,7 @@ addEventListener('load', () => {
           frame(),
           ...($update.checked
             ? [
-                Game.fetchGame(1)
+                Game.fetchGame()
                   .then(({ g }) => {
                     refreshGame(g, view);
                   })
@@ -333,6 +335,7 @@ addEventListener('load', () => {
     }${location.pathname}/../s`
   );
   socket.onopen = async () => {
+    ok = true;
     refreshUser((await Game.fetchUser()).u);
   };
   socket.onmessage = ({ data }) => {
@@ -346,6 +349,7 @@ addEventListener('load', () => {
     pool.delete($);
   };
   const handleError = () => {
+    ok = false;
     $board.style.setProperty('background', 'orangered');
   };
   socket.onclose = handleError;

@@ -4,8 +4,6 @@ import { parseArgs } from 'https://deno.land/std@0.223.0/cli/parse_args.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
-const game = new Game(30, 30, 10, 10, 10);
-
 const log = (
   type: string,
   user?: User,
@@ -20,8 +18,28 @@ const log = (
   );
 };
 
-const args = parseArgs<{ p: unknown; port: unknown }>(Deno.args);
+type args =
+  | 'p'
+  | 'port'
+  | 'w'
+  | 'width'
+  | 'h'
+  | 'height'
+  | 'g'
+  | 'gold'
+  | 'e'
+  | 'energy'
+  | 'b'
+  | 'blast';
+const args = parseArgs<Record<args, unknown>>(Deno.args);
 const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
+const width = Number(args.w) || Number(args.width) || 30;
+const height = Number(args.h) || Number(args.height) || 30;
+const gold = Number(args.g) || Number(args.gold) || 0;
+const energy = Number(args.e) || Number(args.energy) || 0;
+const blast = Number(args.b) || Number(args.blast) || 0;
+
+const game = new Game(width, height, gold, energy, blast);
 
 await new Application()
   .use(
@@ -57,7 +75,7 @@ await new Application()
             d.u = user;
           }
           if (typeof x === 'number' && typeof y === 'number') {
-            log('attack', user, { x, y, z });
+            log('attack', user, z ? { x, y, z } : { x, y });
             game.attack(x, y, user, z);
           }
           try {
