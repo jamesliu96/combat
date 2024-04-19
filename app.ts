@@ -18,7 +18,7 @@ const log = (
   );
 };
 
-type args =
+type Args =
   | 'p'
   | 'port'
   | 'w'
@@ -31,7 +31,7 @@ type args =
   | 'energy'
   | 'b'
   | 'blast';
-const args = parseArgs<Record<args, unknown>>(Deno.args);
+const args = parseArgs<Record<Args, unknown>>(Deno.args);
 const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
 const width = Number(args.w) || Number(args.width) || 30;
 const height = Number(args.h) || Number(args.height) || 30;
