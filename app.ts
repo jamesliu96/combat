@@ -89,12 +89,10 @@ new Application()
             log('ERR', undefined, err);
           }
         };
-        const handleError = () => {
+        socket.onclose = socket.onerror = () => {
           log('bye', user);
           game.users.delete(user);
         };
-        socket.onclose = handleError;
-        socket.onerror = handleError;
       })
       .get('/.*', async (ctx) => {
         ctx.response = await serveDir(ctx.request, {

@@ -348,12 +348,10 @@ addEventListener('load', () => {
     pool.get($)?.(data);
     pool.delete($);
   };
-  const handleError = () => {
+  socket.onclose = socket.onerror = () => {
     ok = false;
     $board.style.setProperty('background', 'orangered');
   };
-  socket.onclose = handleError;
-  socket.onerror = handleError;
   $set.onclick = async () => {
     if ($name.value) refreshUser((await Game.updateUserName($name.value)).u);
   };
