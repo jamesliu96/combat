@@ -1,4 +1,9 @@
-import { Application, Router } from 'https://deno.land/x/railgun@v0.5.6/mod.ts';
+import {
+  Application,
+  Router,
+  STATUS_CODE,
+  STATUS_TEXT,
+} from 'https://deno.land/x/railgun@v0.6.1/mod.ts';
 import { serveDir } from 'https://deno.land/std@0.223.0/http/file_server.ts';
 import { parseArgs } from 'https://deno.land/std@0.223.0/cli/parse_args.ts';
 import { Game } from './game.ts';
@@ -41,7 +46,7 @@ const blast = Number(args.b) || Number(args.blast) || 0;
 
 const game = new Game(width, height, gold, energy, blast);
 
-await new Application()
+new Application()
   .use(
     new Router()
       .get('/g', (ctx) => {
@@ -99,13 +104,15 @@ await new Application()
       })
       .handle()
   )
-  .listen(
-    { port },
-    {
-      onListen: (listener) => {
-        log(
-          `server starts listening at :${(listener.addr as Deno.NetAddr).port}`
-        );
-      },
-    }
-  );
+  .serve({
+    port,
+    onListen: ({ port }) => {
+      log(`server starts listening at :${port}`);
+    },
+    onError(error) {
+      return new Response(`${error}`, {
+        status: STATUS_CODE.InternalServerError,
+        statusText: STATUS_TEXT[STATUS_CODE.InternalServerError],
+      });
+    },
+  });
