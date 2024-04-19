@@ -71,46 +71,46 @@ interface Blast {
 
 interface Helpers {
   /** Blast */
-  Blast: Blast;
+  readonly Blast: Readonly<Blast>;
   /** Get cell */
-  getCell: (g: IGame, x: number, y: number) => ICell | undefined;
+  getCell(g: IGame, x: number, y: number): ICell | undefined;
   /** Whether the cell is owned by user */
-  isCellOwnedBy: (c: ICell, u: IUser) => boolean;
+  isCellOwnedBy(c: ICell, u: IUser): boolean;
   /** Whether the cell is being attacked by user */
-  isCellAttackedBy: (c: ICell, u: IUser) => boolean;
+  isCellAttackedBy(c: ICell, u: IUser): boolean;
   /** Get adjacent cells (by user) */
-  getAdjCells: (g: IGame, c: ICell, u?: IUser) => ICell[];
+  getAdjCells(g: IGame, c: ICell, u?: IUser): ICell[];
   /** Get owned cells */
-  getUserOwnedCells: (g: IGame, u: IUser) => ICell[];
+  getUserOwnedCells(g: IGame, u: IUser): ICell[];
   /** Whether user has base */
-  hasUserBase: (g: IGame, u: IUser) => boolean;
+  hasUserBase(g: IGame, u: IUser): boolean;
   /** Whether user is attacking */
-  isUserAttacking: (g: IGame, u: IUser) => boolean;
+  isUserAttacking(g: IGame, u: IUser): boolean;
   /** Get cell time cost (by user) */
-  getCellTime: (g: IGame, c: ICell, u?: IUser) => number;
+  getCellTime(g: IGame, c: ICell, u?: IUser): number;
   /** Get user energy */
-  getUserEnergy: (g: IGame, u: IUser) => number;
+  getUserEnergy(g: IGame, u: IUser): number;
   /** Get user score */
-  getUserScore: (g: IGame, u: IUser) => number;
+  getUserScore(g: IGame, u: IUser): number;
   /** Calculate distance between two cells */
-  calcDist: (a: ICell, b: ICell) => number;
+  calcDist(a: ICell, b: ICell): number;
 }
 
 declare const Helpers: Helpers;
 
 interface Game {
   /** Fetch user */
-  fetchUser: () => Promise<{ u: IUser }>;
+  fetchUser(): Promise<{ u: IUser }>;
   /** Fetch game */
-  fetchGame: () => Promise<{ g: IGame }>;
+  fetchGame(): Promise<{ g: IGame }>;
   /** Update user name */
-  updateUserName: (n: string) => Promise<{ u: IUser }>;
+  updateUserName(n: string): Promise<{ u: IUser }>;
   /** Update user hue */
-  updateUserHue: (h: number) => Promise<{ u: IUser }>;
+  updateUserHue(h: number): Promise<{ u: IUser }>;
   /** Attack a cell */
-  attack: (x: number, y: number, z?: Blast[keyof Blast]) => Promise<void>;
+  attack(x: number, y: number, z?: Blast[keyof Blast]): Promise<void>;
   /** Output log */
-  log: (...args: unknown[]) => Promise<void>;
+  log(...args: unknown[]): Promise<void>;
 }
 
 declare const Game: Game;
