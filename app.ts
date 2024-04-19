@@ -1,4 +1,4 @@
-import { Application, Router } from 'https://deno.land/x/railgun@v0.5.4/mod.ts';
+import { Application, Router } from 'https://deno.land/x/railgun@v0.5.6/mod.ts';
 import { serveDir } from 'https://deno.land/std@0.223.0/http/file_server.ts';
 import { parseArgs } from 'https://deno.land/std@0.223.0/cli/parse_args.ts';
 import { Game } from './game.ts';
