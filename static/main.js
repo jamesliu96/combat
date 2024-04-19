@@ -60,21 +60,22 @@ addEventListener('load', () => {
         ...Array.from(Array(g.c.length), (_, idx) => {
           const $cell = document.createElement('div');
           $cell.className = 'cell';
-          const { x, y } = g.c[idx];
+          const { x, y, b } = g.c[idx];
           $cell.onclick = () => {
             Game.attack(x, y);
           };
           $cell.oncontextmenu = (e) => {
             e.preventDefault();
-            Game.attack(
-              x,
-              y,
-              e.metaKey || e.ctrlKey
-                ? Helpers.Blast.Horizontal
-                : e.shiftKey
-                ? Helpers.Blast.Vertical
-                : Helpers.Blast.Square
-            );
+            if (b)
+              Game.attack(
+                x,
+                y,
+                e.metaKey || e.ctrlKey
+                  ? Helpers.Blast.Horizontal
+                  : e.shiftKey
+                  ? Helpers.Blast.Vertical
+                  : Helpers.Blast.Square
+              );
           };
           return $cell;
         })
