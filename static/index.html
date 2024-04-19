@@ -66,6 +66,7 @@
       }
       .player.self {
         font-weight: bold;
+        text-decoration: underline;
       }
       .player.active {
         pointer-events: auto;
@@ -111,6 +112,7 @@
       }
       .cell.self {
         font-weight: bold;
+        text-decoration: underline;
       }
       #uuid {
         color: lightgray;
@@ -131,7 +133,7 @@
       <div class="logic">
         <input id="name" maxlength="16" placeholder="nickname" />
         <button id="set">set</button>
-        <div id="color" class="cell">0</div>
+        <div id="color" class="cell self">0</div>
       </div>
       <div class="board">🍄</div>
       <div id="uuid"></div>
