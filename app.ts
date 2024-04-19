@@ -3,7 +3,7 @@ import {
   Router,
   STATUS_CODE,
   STATUS_TEXT,
-} from 'https://deno.land/x/railgun@v0.6.1/mod.ts';
+} from 'https://deno.land/x/railgun@v0.6.2/mod.ts';
 import { serveDir } from 'https://deno.land/std@0.223.0/http/file_server.ts';
 import { parseArgs } from 'https://deno.land/std@0.223.0/cli/parse_args.ts';
 import { Game } from './game.ts';
@@ -14,9 +14,8 @@ const log = (
   user?: User,
   ...args: Parameters<typeof console.log>
 ) => {
-  const d = new Date().toISOString();
   console.log(
-    `[${d.slice(0, 10)} ${d.slice(11, 19)}] ${type}${
+    `[${new Date().toISOString()}] ${type}${
       user ? ` ${user.name}{${user.uuid}}` : ''
     }`,
     ...args
