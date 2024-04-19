@@ -23,26 +23,15 @@ const log = (
   );
 };
 
-type Args =
-  | 'p'
-  | 'port'
-  | 'w'
-  | 'width'
-  | 'h'
-  | 'height'
-  | 'g'
-  | 'gold'
-  | 'e'
-  | 'energy'
-  | 'b'
-  | 'blast';
-const args = parseArgs<Record<Args, unknown>>(Deno.args);
-const port = Number(args.p) || Number(args.port) || Number(args._[0]) || 3000;
-const width = Number(args.w) || Number(args.width) || 30;
-const height = Number(args.h) || Number(args.height) || 30;
-const gold = Number(args.g) || Number(args.gold) || 0;
-const energy = Number(args.e) || Number(args.energy) || 0;
-const blast = Number(args.b) || Number(args.blast) || 0;
+const args = parseArgs<Record<'p' | 'w' | 'h' | 'g' | 'e' | 'b', unknown>>(
+  Deno.args
+);
+const port = Number(args.p || args._[0]) || 3000;
+const width = Number(args.w) || 30;
+const height = Number(args.h) || 30;
+const gold = Number(args.g) || 0;
+const energy = Number(args.e) || 0;
+const blast = Number(args.b) || 0;
 
 const game = new Game(width, height, gold, energy, blast);
 
