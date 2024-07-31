@@ -3,9 +3,9 @@ import {
   Router,
   STATUS_CODE,
   STATUS_TEXT,
-} from 'https://deno.land/x/railgun@v0.6.2/mod.ts';
-import { serveDir } from 'https://deno.land/std@0.223.0/http/file_server.ts';
-import { parseArgs } from 'https://deno.land/std@0.223.0/cli/parse_args.ts';
+} from 'https://deno.land/x/railgun@v0.6.3/mod.ts';
+import { serveDir } from 'https://deno.land/std@0.224.0/http/file_server.ts';
+import { parseArgs } from 'https://deno.land/std@0.224.0/cli/parse_args.ts';
 import { Game } from './game.ts';
 import { User } from './user.ts';
 
