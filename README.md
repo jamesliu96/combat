@@ -1,6 +1,6 @@
 # combat
 
-a game 🔫 🦕
+a game
 
 ## run
 
